@@ -98,6 +98,8 @@ if DB_CA_PATH:
 app.config["SQLALCHEMY_POOL_RECYCLE"] = 280
 app.config["SQLALCHEMY_POOL_TIMEOUT"] = 20
 app.config["SECRET_KEY"] = os.environ.get("JWT_SECRET", "sugarcane_secret_jwt_key_2027")
+AUTH_COOKIE_SAMESITE = os.environ.get("AUTH_COOKIE_SAMESITE", "Lax")
+AUTH_COOKIE_SECURE = os.environ.get("AUTH_COOKIE_SECURE", "false").strip().lower() in {"1", "true", "yes", "on"}
 
 configured_frontend_origins = [
     origin.strip().rstrip("/")
@@ -400,14 +402,20 @@ def auth_login():
         "token": token,
         "data": {"user": user.to_dict()}
     }))
-    resp.set_cookie("token", token, httponly=True, samesite="Lax", max_age=7*86400)
+    resp.set_cookie(
+        "token", token, httponly=True, samesite=AUTH_COOKIE_SAMESITE,
+        secure=AUTH_COOKIE_SECURE, max_age=7*86400
+    )
     return resp
 
 
 @app.route("/api/auth/logout", methods=["POST"])
 def auth_logout():
     resp = make_response(jsonify({"success": True, "message": "Logged out successfully."}))
-    resp.set_cookie("token", "", expires=0)
+    resp.set_cookie(
+        "token", "", expires=0, httponly=True,
+        samesite=AUTH_COOKIE_SAMESITE, secure=AUTH_COOKIE_SECURE
+    )
     return resp
 
 
@@ -3380,7 +3388,10 @@ def auth_verify_email(token):
         "message": "Email verified successfully! You can now access your account.",
         "data": {"user": user.to_dict()}
     }))
-    resp.set_cookie("token", token, httponly=True, samesite="Lax", max_age=7*86400)
+    resp.set_cookie(
+        "token", token, httponly=True, samesite=AUTH_COOKIE_SAMESITE,
+        secure=AUTH_COOKIE_SECURE, max_age=7*86400
+    )
     return resp
 
 

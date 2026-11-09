@@ -263,6 +263,28 @@ export default function AppLayout({ children }) {
             )}
           </div>
 
+          {farms.length > 0 && (
+            <label className="mobile-field-picker">
+              <span className="mobile-field-picker-label"><MapPin size={14} /> Active field</span>
+              <select
+                value={selectedFieldId || ''}
+                onChange={(event) => selectField(event.target.value)}
+                aria-label="Choose active field"
+              >
+                <option value="">No active field</option>
+                {farms.map(farm => (
+                  <optgroup key={farm.id} label={farm.name}>
+                    {(farm.fields || []).map(field => (
+                      <option key={field.id} value={field.id}>
+                        {field.name} ({field.sugarcane_variety || 'Variety unavailable'})
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </label>
+          )}
+
           <div className="topbar-right">
             {/* Theme Toggle Button */}
             <button

@@ -1,5 +1,36 @@
 import axios from 'axios';
 
+const SESSION_TOKEN_KEY = 'sugaryield_session_token';
+
+export function storeSessionToken(token) {
+  if (typeof window === 'undefined' || !token) return;
+  try {
+    // Keep the fallback tab-scoped; the HTTP-only cookie remains the primary
+    // session mechanism where the browser accepts cross-site cookies.
+    window.sessionStorage.setItem(SESSION_TOKEN_KEY, token);
+  } catch {
+    // Private browsing modes may disable session storage; cookie auth remains.
+  }
+}
+
+export function clearSessionToken() {
+  if (typeof window === 'undefined') return;
+  try {
+    window.sessionStorage.removeItem(SESSION_TOKEN_KEY);
+  } catch {
+    // Ignore unavailable session storage.
+  }
+}
+
+function getSessionToken() {
+  if (typeof window === 'undefined') return null;
+  try {
+    return window.sessionStorage.getItem(SESSION_TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
 function getBase() {
   const env = import.meta.env.VITE_API_URL;
   if (typeof window !== 'undefined') {
@@ -14,6 +45,15 @@ export const api = axios.create({
   baseURL: getBase(),
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' }
+});
+
+api.interceptors.request.use((config) => {
+  const token = getSessionToken();
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export async function request(method, path, data) {

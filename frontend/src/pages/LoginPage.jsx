@@ -7,7 +7,7 @@ import { ArrowRight, Mail, ShieldCheck, Sprout } from 'lucide-react';
 import AuthLayout from '../layouts/AuthLayout';
 import PasswordInput from '../components/PasswordInput';
 import SubmitButton from '../components/SubmitButton';
-import { request } from '../services/api';
+import { request, storeSessionToken } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 const schema = z.object({
@@ -27,6 +27,7 @@ export default function LoginPage() {
   const onSubmit = async ({ email, password }) => {
     try {
       const result = await request('post', '/auth/login', { email, password, portal: 'user' });
+      storeSessionToken(result.token);
       setUser(result.data.user);
       navigate(location.state?.from?.pathname || '/dashboard', { replace: true });
     } catch (error) {

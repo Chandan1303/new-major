@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { request } from '../services/api';
+import { clearSessionToken, request } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -41,8 +41,12 @@ export function AuthProvider({ children }) {
     refresh,
     setUser,
     logout: async () => {
-      await request('post', '/auth/logout');
-      setUser(null);
+      try {
+        await request('post', '/auth/logout');
+      } finally {
+        clearSessionToken();
+        setUser(null);
+      }
     }
   };
 

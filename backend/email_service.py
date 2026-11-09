@@ -4,6 +4,9 @@ import smtplib
 import socket
 import ssl
 from email.message import EmailMessage
+from email.utils import parseaddr
+
+import requests
 
 
 def _frontend_base_url():
@@ -28,13 +31,12 @@ def _frontend_base_url():
 
 
 def _send_auth_email(recipient, name, token, *, is_reset):
+    provider = os.environ.get("EMAIL_PROVIDER", "smtp").strip().lower()
     host = os.environ.get("EMAIL_HOST")
     port = int(os.environ.get("EMAIL_PORT", "587"))
     username = os.environ.get("EMAIL_USER")
     password = os.environ.get("EMAIL_PASSWORD")
     sender = os.environ.get("EMAIL_FROM") or username
-    if not host or not sender:
-        raise RuntimeError("Email delivery is not configured.")
 
     if is_reset:
         subject = "Reset your SugarYield AI password"
@@ -64,6 +66,32 @@ def _send_auth_email(recipient, name, token, *, is_reset):
         f"<p>{expires}</p></body></html>",
         subtype="html",
     )
+
+    if provider == "brevo":
+        api_key = os.environ.get("BREVO_API_KEY")
+        sender_name, sender_email = parseaddr(sender or "")
+        if not api_key or not sender_email:
+            raise RuntimeError("Brevo email delivery requires BREVO_API_KEY and EMAIL_FROM.")
+
+        response = requests.post(
+            "https://api.brevo.com/v3/smtp/email",
+            headers={"api-key": api_key, "accept": "application/json"},
+            json={
+                "sender": {"name": sender_name or "SugarYield AI", "email": sender_email},
+                "to": [{"email": recipient, "name": name or ""}],
+                "subject": subject,
+                "textContent": message.get_body(preferencelist=("plain",)).get_content(),
+                "htmlContent": message.get_body(preferencelist=("html",)).get_content(),
+            },
+            timeout=20,
+        )
+        response.raise_for_status()
+        return
+
+    if provider != "smtp":
+        raise RuntimeError(f"Unsupported EMAIL_PROVIDER: {provider}")
+    if not host or not sender:
+        raise RuntimeError("SMTP email delivery requires EMAIL_HOST and EMAIL_FROM.")
 
     if port == 465:
         with smtplib.SMTP_SSL(host, port, context=ssl.create_default_context(), timeout=20) as smtp:

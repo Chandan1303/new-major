@@ -3,6 +3,8 @@
 # Historical NDVI files are required by the Cloud Run fallback when Earth
 # Engine is unavailable. The repository's general *.csv rule otherwise
 # excludes these root-level files from source deployments.
+.git/
+.pytest_cache/
 !cleaned_data/
 !cleaned_data/NDVI_*.csv
 

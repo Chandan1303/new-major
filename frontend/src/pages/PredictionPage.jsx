@@ -38,6 +38,7 @@ import {
   Bell
 } from 'lucide-react';
 import AppLayout from '../components/AppLayout';
+import { cropIntelligenceApi } from '../crop-intelligence/api';
 import Modal from '../components/ui/Modal';
 import Badge from '../components/ui/Badge';
 import SimulatorPage from './SimulatorPage';
@@ -136,12 +137,21 @@ export default function PredictionPage() {
   const [states, setStates] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [varieties, setVarieties] = useState([]);
+  const [varietyProfiles, setVarietyProfiles] = useState([]);
   const [loadingGeography, setLoadingGeography] = useState(false);
 
   // Farms and fields for pre-filling
   const [farms, setFarms] = useState([]);
   const [selectedFarmId, setSelectedFarmId] = useState('');
   const [selectedFieldId, setSelectedFieldId] = useState('');
+
+  useEffect(() => {
+    let live = true;
+    cropIntelligenceApi.varieties()
+      .then(response => { if (live) setVarietyProfiles(response.data?.varieties || []); })
+      .catch(() => { if (live) setVarietyProfiles([]); });
+    return () => { live = false; };
+  }, []);
 
   // 11 Core Agronomic Inputs + Season
   const [formData, setFormData] = useState(() => selectedPrediction?.input_data || INITIAL_FORM_DATA);
@@ -542,7 +552,7 @@ export default function PredictionPage() {
         soil_ph: parseFloat(formData.soil_ph) || 7.2,
         soil_moisture: parseFloat(formData.soil_moisture) || 60,
         variety: formData.variety,
-        historical_yield: parseFloat(formData.historical_yield) || 95
+        historical_yield: Number(formData.historical_yield || 0)
       };
       const res = await mlApi.dataQuality(payload);
       setDataQuality(res.data);
@@ -573,7 +583,7 @@ export default function PredictionPage() {
         humidity_pct: parseFloat(formData.humidity) || 70.0,
         soil_moisture: parseFloat(formData.soil_moisture) || 60.0,
         soil_ph: parseFloat(formData.soil_ph) || 7.0,
-        historical_yield: parseFloat(formData.historical_yield) || 85.0,
+        historical_yield: Number(formData.historical_yield || 0),
         farm_id: selectedFarmId ? Number(selectedFarmId) : null,
         field_id: selectedFieldId ? Number(selectedFieldId) : null,
         farm_name: farms.find(farm => String(farm.id) === String(selectedFarmId))?.name || '',
@@ -688,8 +698,17 @@ export default function PredictionPage() {
   const positiveModelFactors = result?.explainable_ai?.positive_factors || [];
   const topModelDrivers = (result?.explainable_ai?.feature_contributions || result?.feature_importance || []).slice(0, 3);
   const priorYield = Number(auditInputs.historical_yield ?? auditInputs.prev_year_yield);
+  const isFirstSeasonForVariety = Number.isFinite(priorYield) && priorYield === 0;
   const priorYieldIsMainDriver = topModelDrivers.some(driver => /historical yield/i.test(driver.feature || ''));
   const activeVariety = auditInputs.variety || result?.variety || formData.variety;
+  const activeSeason = auditInputs.season || result?.season || formData.season;
+  const activeProfile = varietyProfiles.find(profile =>
+    (profile.code || profile.official_identifier || '').toLocaleLowerCase() === String(activeVariety || '').toLocaleLowerCase()
+  );
+  const recordedSeasonGuidance = activeProfile?.seasons
+    && !/unavailable|not listed|not available/i.test(String(activeProfile.seasons))
+    ? activeProfile.seasons
+    : '';
   const forecastWarningItems = [
     ...yieldGapFactors.factors.map((factor, index) => ({
       id: `factor-${index}`,
@@ -1118,15 +1137,17 @@ export default function PredictionPage() {
                     <input
                       type="number"
                       step="0.5"
-                      min="30"
+                      min="0"
                       max="220"
                       name="historical_yield"
                       value={formData.historical_yield}
                       onChange={handleChange}
-                      placeholder="e.g. 95.0"
+                      placeholder="Enter 0 for a first-time variety"
                       required
                     />
-                    <small style={{ color: 'var(--text-muted)', fontSize: 11.5, marginTop: 4, display: 'block' }}>Last season's actual harvest yield for this field/block</small>
+                    <small style={{ color: 'var(--text-muted)', fontSize: 11.5, marginTop: 4, display: 'block' }}>
+                      Enter 0 if this variety is being grown in this field for the first time. The forecast will use the selected variety, soil, weather, and other field inputs.
+                    </small>
                   </div>
                 </div>
 
@@ -1244,6 +1265,26 @@ export default function PredictionPage() {
                     </div>
                   </div>
                 </div>
+
+                <div role="status" style={{ display: 'flex', alignItems: 'flex-start', gap: 13, padding: '16px 18px', margin: '0 0 20px', borderRadius: 14, background: 'var(--bg-card)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
+                  <span style={{ display: 'grid', placeItems: 'center', width: 38, height: 38, flex: '0 0 38px', borderRadius: 11, color: '#245f3e', background: '#e8f3e8' }}><Calendar size={18} /></span>
+                  <div style={{ minWidth: 0 }}>
+                    <strong style={{ display: 'block', marginBottom: 4, color: 'var(--text-primary)', fontSize: 14 }}>{activeVariety} · {activeSeason || 'Season not specified'}</strong>
+                    <span style={{ display: 'block', color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.55 }}>
+                      {recordedSeasonGuidance
+                        ? <>Recorded planting-season reference for {activeVariety}: {recordedSeasonGuidance}</>
+                        : <>No variety-specific planting-season guidance is recorded for {activeVariety}. Verify the recommended planting window with your local agriculture department or mill before planting.</>}
+                    </span>
+                    <small style={{ display: 'block', marginTop: 6, color: 'var(--text-muted)', fontSize: 11.5 }}>Regional guidance is a reference; it does not confirm that the selected season is locally suitable.</small>
+                  </div>
+                </div>
+
+                {isFirstSeasonForVariety && (
+                  <div role="status" style={{ margin: '0 0 20px', padding: 16, borderRadius: 12, background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
+                    <strong>First season for {activeVariety} in this field</strong>
+                    <p style={{ margin: '5px 0 0', color: 'var(--text-secondary)' }}>No previous-year yield was used. This forecast is based on the selected variety and the soil, weather, and other field details you provided.</p>
+                  </div>
+                )}
 
                 {/* Key Outputs Metric Cards */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>

@@ -26,6 +26,7 @@ import bcrypt
 from flask import Flask, request, jsonify, make_response, redirect
 from flask_cors import CORS
 from sqlalchemy import func, inspect, text
+from urllib.parse import quote_plus
 import numpy as np
 
 try:
@@ -62,10 +63,11 @@ from reports.report_generator import AgronomicReportGenerator
 app = Flask(__name__)
 
 DB_USER = os.environ.get("DB_USER")
-DB_PASS = os.environ.get("DB_PASS")
+DB_PASS = os.environ.get("DB_PASSWORD") or os.environ.get("DB_PASS")
 DB_HOST = os.environ.get("DB_HOST")
 DB_PORT = os.environ.get("DB_PORT", "3306")
 DB_NAME = os.environ.get("DB_NAME")
+DB_CA_PATH = os.environ.get("DB_SSL_CA")
 
 
 def resolve_database_uri():
@@ -80,7 +82,8 @@ def resolve_database_uri():
         return f"sqlite:///{sqlite_db_path}"
 
     if DB_USER and DB_HOST and DB_NAME:
-        return f"mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}?charset=utf8mb4"
+        password = quote_plus(DB_PASS or "")
+        return f"mysql+pymysql://{DB_USER}:{password}@{DB_HOST}:{DB_PORT}/{DB_NAME}?charset=utf8mb4"
 
     sqlite_db_path = (ROOT_DIR / "backend" / "sugar_yield.db").resolve()
     return f"sqlite:///{sqlite_db_path}"
@@ -88,6 +91,10 @@ def resolve_database_uri():
 
 app.config["SQLALCHEMY_DATABASE_URI"] = resolve_database_uri()
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+if DB_CA_PATH:
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "connect_args": {"ssl": {"ca": DB_CA_PATH}}
+    }
 app.config["SQLALCHEMY_POOL_RECYCLE"] = 280
 app.config["SQLALCHEMY_POOL_TIMEOUT"] = 20
 app.config["SECRET_KEY"] = os.environ.get("JWT_SECRET", "sugarcane_secret_jwt_key_2027")
@@ -124,9 +131,9 @@ def ndvi_compat(subpath):
 
 def seed_default_roles():
     default_roles = [
-        {"id": 1, "name": "user", "display_name": "Farmer / User", "description": "Primary farm operator"},
-        {"id": 2, "name": "officer", "display_name": "Agricultural Officer", "description": "Field advisory role"},
-        {"id": 3, "name": "admin", "display_name": "Administrator", "description": "Platform administrator"},
+        {"name": "farmer", "display_name": "Farmer / User", "description": "Primary farm operator"},
+        {"name": "officer", "display_name": "Agricultural Officer", "description": "Field advisory role"},
+        {"name": "admin", "display_name": "Administrator", "description": "Platform administrator"},
     ]
 
     for role_data in default_roles:
@@ -297,13 +304,17 @@ def auth_register():
 
     hashed_pw = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
     verification_token = secrets.token_hex(32)
+    standard_role = Role.query.filter_by(name="farmer").first() or Role.query.filter_by(name="user").first()
+    if standard_role is None:
+        app.logger.error("No farmer/user role is configured")
+        return jsonify({"success": False, "message": "Account registration is temporarily unavailable."}), 503
 
     new_user = User(
         name=name,
         email=email,
         password_hash=hashed_pw,
         role="user",
-        role_id=1,
+        role_id=standard_role.id,
         email_verified=False,
         verification_token=hashlib.sha256(verification_token.encode("utf-8")).hexdigest(),
         verification_token_expires=datetime.utcnow() + timedelta(hours=24),

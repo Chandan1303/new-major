@@ -267,7 +267,7 @@ export default function NewDashboardPage() {
     <AppLayout>
       <div className="page-container">
         {/* Header */}
-        <div className="page-header" style={{ marginBottom: 24 }}>
+        <div className="page-header dashboard-hero" style={{ marginBottom: 24 }}>
           <div>
             <span className="eyebrow">
               <Sparkles size={13} />

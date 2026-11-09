@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  Legend, ReferenceLine
+  Legend, ReferenceLine, ScatterChart, Scatter
 } from 'recharts';
 import {
   BarChart3, TrendingUp, TrendingDown, Award, Calendar, Building2,
   Filter, Sparkles, Sprout, ShieldCheck, ArrowUpRight
 } from 'lucide-react';
 import AppLayout from '../components/AppLayout';
-import { predictionApi, farmApi, historicalYieldApi } from '../services/api';
+import { predictionApi, farmApi, historicalYieldApi, mlApi } from '../services/api';
 import StatCard from '../components/ui/StatCard';
 import Badge from '../components/ui/Badge';
 
@@ -23,16 +23,19 @@ export default function AnalyticsPage() {
   const [selectedField, setSelectedField]     = useState('all');
   const [selectedYear, setSelectedYear]       = useState('all');
   const [histData, setHistData]               = useState(null);
+  const [mlPerf, setMlPerf]                   = useState(null);
 
   useEffect(() => {
     Promise.allSettled([
       predictionApi.list(),
       farmApi.list(),
-      historicalYieldApi.analytics(selectedVariety)
-    ]).then(([prRes, frRes, hRes]) => {
+      historicalYieldApi.analytics(selectedVariety),
+      mlApi.performance()
+    ]).then(([prRes, frRes, hRes, mlRes]) => {
       if (prRes.status === 'fulfilled') setPreds(prRes.value.data?.predictions || []);
       if (frRes.status === 'fulfilled') setFarms(frRes.value.data?.farms || []);
       if (hRes.status === 'fulfilled') setHistData(hRes.value.data?.data || hRes.value.data);
+      if (mlRes.status === 'fulfilled') setMlPerf(mlRes.value.data || mlRes.value);
     }).catch(e => console.error(e))
       .finally(() => setLoading(false));
   }, []);
@@ -70,6 +73,20 @@ export default function AnalyticsPage() {
   const minYield  = histData?.minimum_yield ?? 98.2;
   const maxYield  = histData?.maximum_yield ?? 116.2;
   const growthPct = histData?.net_5yr_growth_pct ?? 16.9;
+  const predictionKey = mlPerf?.best_model === 'xgboost' ? 'xgb_predicted' : 'rf_predicted';
+  const comparisonPoints = (mlPerf?.actual_vs_predicted || [])
+    .map(point => ({
+      id: point.id,
+      actual: Number(point.actual),
+      predicted: Number(point[predictionKey])
+    }))
+    .filter(point => Number.isFinite(point.actual) && Number.isFinite(point.predicted));
+  const comparisonMae = comparisonPoints.length
+    ? comparisonPoints.reduce((sum, point) => sum + Math.abs(point.predicted - point.actual), 0) / comparisonPoints.length
+    : null;
+  const yieldAxisMax = Math.ceil(
+    Math.max(0, ...comparisonPoints.map(point => Math.max(point.actual, point.predicted))) / 10
+  ) * 10;
 
   if (loading) {
     return (
@@ -191,6 +208,86 @@ export default function AnalyticsPage() {
             trend="Positive agronomic trajectory"
             subtitle="Overall cultivar efficiency"
           />
+        </div>
+
+        {/* Holdout-set actual vs predicted model evaluation */}
+        <div className="card" style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-color)', background: 'var(--card-bg)', marginBottom: 24 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <div>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
+                Actual vs. Predicted Yield (t/ha)
+              </h3>
+              <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                {mlPerf?.best_model
+                  ? `${mlPerf.best_model === 'xgboost' ? 'XGBoost' : 'Random Forest'} predictions on held-out test data`
+                  : 'Model evaluation data'}
+              </span>
+            </div>
+            <Badge variant="primary">{comparisonPoints.length} test samples</Badge>
+          </div>
+
+          {comparisonPoints.length > 0 ? (
+            <>
+              <ResponsiveContainer width="100%" height={340}>
+                <ScatterChart margin={{ top: 16, right: 24, bottom: 24, left: 16 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+                <XAxis
+                  type="number"
+                  dataKey="actual"
+                  name="Actual yield"
+                  domain={[0, yieldAxisMax]}
+                  tick={{ fontSize: 11, fill: 'var(--text-secondary)' }}
+                  label={{ value: 'Actual Yield (t/ha)', position: 'insideBottom', offset: -14, fill: 'var(--text-secondary)' }}
+                />
+                <YAxis
+                  type="number"
+                  dataKey="predicted"
+                  name="Predicted yield"
+                  domain={[0, yieldAxisMax]}
+                  tick={{ fontSize: 11, fill: 'var(--text-secondary)' }}
+                  label={{ value: 'Predicted Yield (t/ha)', angle: -90, position: 'insideLeft', fill: 'var(--text-secondary)' }}
+                />
+                <Tooltip
+                  formatter={(value, name) => [`${Number(value).toFixed(1)} t/ha`, name]}
+                  labelFormatter={(_, payload) => payload?.[0]?.payload?.id != null ? `Test sample ${payload[0].payload.id + 1}` : 'Test sample'}
+                  contentStyle={{ background: 'var(--card-bg)', border: '1px solid var(--border-color)', borderRadius: 8 }}
+                />
+                <ReferenceLine
+                  segment={[{ x: 0, y: 0 }, { x: yieldAxisMax, y: yieldAxisMax }]}
+                  stroke="#64748b"
+                  strokeDasharray="5 5"
+                  label={{ value: 'Perfect prediction', position: 'insideTopLeft', fill: 'var(--text-muted)', fontSize: 11 }}
+                />
+                <Scatter name="Test samples" data={comparisonPoints} fill="#10b981" />
+                </ScatterChart>
+              </ResponsiveContainer>
+              <div style={{ marginTop: 12, color: 'var(--text-secondary)', fontSize: 13 }}>
+              Mean absolute error across these {comparisonPoints.length} displayed test samples: <strong>{comparisonMae.toFixed(1)} t/ha</strong>.
+              Each point uses the same model as the chart legend; the dashed diagonal marks a perfect match.
+              </div>
+              <div style={{ overflowX: 'auto', marginTop: 16 }}>
+              <table className="data-table" style={{ width: '100%' }}>
+                <thead>
+                  <tr><th>Test Sample</th><th>Actual Yield (t/ha)</th><th>Predicted Yield (t/ha)</th><th>Error (Predicted − Actual)</th></tr>
+                </thead>
+                <tbody>
+                  {comparisonPoints.map((point, index) => (
+                    <tr key={point.id ?? index}>
+                      <td>{point.id != null ? point.id + 1 : index + 1}</td>
+                      <td>{point.actual.toFixed(1)}</td>
+                      <td>{point.predicted.toFixed(1)}</td>
+                      <td>{(point.predicted - point.actual >= 0 ? '+' : '') + (point.predicted - point.actual).toFixed(1)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              </div>
+            </>
+          ) : (
+            <p style={{ color: 'var(--text-muted)', margin: 0 }}>
+              Model evaluation points are not available. Retrain the model to generate the holdout-set comparison data.
+            </p>
+          )}
         </div>
 
         {/* Multi-Year Comparison Recharts Bar Chart */}

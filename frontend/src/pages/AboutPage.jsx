@@ -9,10 +9,10 @@ import StatCard from '../components/ui/StatCard';
 import Badge from '../components/ui/Badge';
 
 const team = [
-  { name: 'Team Member 1', role: 'ML Engineer & Python Backend', color: '#10b981' },
-  { name: 'Team Member 2', role: 'Frontend & UI/UX Architect',   color: '#3b82f6' },
-  { name: 'Team Member 3', role: 'Agronomy & Decision Support',  color: '#8b5cf6' },
-  { name: 'Team Member 4', role: 'Database & Systems Engineer',  color: '#f59e0b' },
+  { initials: 'CH', name: 'Chandan Shridhar Hegde', usn: '4NI23IS253', role: 'ML Engineer & Python Backend', color: '#10b981' },
+  { initials: 'HS', name: 'Harsha S', usn: '4NI24IS408', role: 'Frontend & UI/UX Architect', color: '#3b82f6' },
+  { initials: 'DS', name: 'Dayanand Shivananda Sagar', usn: '4NI23IS252', role: 'Agronomy & Decision Support', color: '#8b5cf6' },
+  { initials: 'MH', name: 'Mohammad Masood Hassan', usn: '4NI24IS412', role: 'Database & Systems Engineer', color: '#f59e0b' },
 ];
 
 const technologies = [
@@ -44,7 +44,7 @@ export default function AboutPage() {
             </div>
             <h1 className="page-title" style={{ margin: '0 0 6px' }}>SugarYield AI Platform</h1>
             <p className="page-subtitle" style={{ margin: 0, color: 'var(--text-secondary)' }}>
-              Next-generation AI yield forecasting and precision agronomic decision support system for sugarcane agriculture.
+              A web-based sugarcane yield estimation system using machine learning on agronomic, weather, crop and location data, with weather, crop-guidance and NDVI services.
             </p>
           </div>
           <Badge variant="success">Final Academic Major Project 2026–27</Badge>
@@ -84,50 +84,21 @@ export default function AboutPage() {
                 Agricultural Mission & Architecture Overview
               </h2>
               <p style={{ margin: '0 0 12px', fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                <strong>SugarYield AI</strong> is an end-to-end precision agricultural platform engineered to assist Indian sugarcane growers, agronomists, and extension officers in making data-driven decisions. By integrating field-level edaphic chemistry, live meteorological telemetry, 6-stage phenology tracking, and multi-year historical harvest records, it delivers verified yield forecasts powered by trained Random Forest and XGBoost regression ensembles.
+                <strong>SugarYield AI</strong> is a web-based system that estimates sugarcane yield using machine learning on agronomic, weather, crop and location data. It also brings weather, crop-guidance and NDVI services together to support informed field decisions.
               </p>
               <p style={{ margin: 0, fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                The core machine learning engine was trained on <strong>7,861 validated field samples</strong> across India's premier sugarcane cultivating regions (Maharashtra, Karnataka, Uttar Pradesh, Tamil Nadu, Andhra Pradesh), achieving a verified <strong>5-Fold Cross-Validation R² of 0.8005 (80.1%)</strong> using pure agronomic parameters without remote sensing or satellite imagery dependencies.
+                The saved Random Forest model reached a test-set <strong>R² of 0.7866</strong> on the project dataset.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Core Architectural Benchmarks */}
+        {/* Project Model & Data Summary */}
         <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', marginBottom: 24 }}>
-          <StatCard
-            label="Training Dataset Volume"
-            value="7,861"
-            unit="records"
-            icon={Database}
-            color="emerald"
-            subtitle="Multi-state verified samples"
-          />
-          <StatCard
-            label="Cross-Validation R² Score"
-            value="80.1%"
-            unit=""
-            icon={Award}
-            color="blue"
-            trend="5-Fold Generalization"
-            subtitle="Mean test concordance"
-          />
-          <StatCard
-            label="Mean Absolute Error"
-            value="8.8"
-            unit="t/ha"
-            icon={Target}
-            color="purple"
-            subtitle="Residual spread across test set"
-          />
-          <StatCard
-            label="Commercial Varieties"
-            value="5"
-            unit="cultivars"
-            icon={Sprout}
-            color="teal"
-            subtitle="Co 86032, Co 0238, CoC 671…"
-          />
+          <StatCard label="Yield Prediction Model" value="Random Forest" unit="" icon={Cpu} color="emerald" subtitle="Saved machine learning model" />
+          <StatCard label="Test-Set R² Score" value="0.7866" unit="" icon={Award} color="blue" trend="Project dataset" subtitle="Random Forest evaluation" />
+          <StatCard label="Model Inputs" value="4 data groups" unit="" icon={Target} color="purple" subtitle="Agronomy, weather, crop & location" />
+          <StatCard label="Decision Support" value="NDVI + guidance" unit="" icon={Sprout} color="teal" subtitle="Weather and crop services" />
         </div>
 
         {/* Project Objectives Grid */}
@@ -224,16 +195,17 @@ export default function AboutPage() {
           {/* Team Members */}
           <div className="card" style={{ padding: 22, borderRadius: 16, border: '1px solid var(--border-color)', background: 'var(--card-bg)' }}>
             <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Users size={16} color="var(--primary)" /> Project Engineering Team
+              <Users size={16} color="var(--primary)" /> Project Team
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {team.map(m => (
                 <div key={m.name} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 10, borderRadius: 10, background: 'var(--bg-secondary)' }}>
                   <div style={{ width: 34, height: 34, borderRadius: 8, background: `${m.color}22`, color: m.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 12 }}>
-                    {m.name.slice(0, 2).toUpperCase()}
+                    {m.initials}
                   </div>
                   <div>
                     <strong style={{ fontSize: 13, color: 'var(--text-primary)', display: 'block' }}>{m.name}</strong>
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block' }}>{m.usn}</span>
                     <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{m.role}</span>
                   </div>
                 </div>
@@ -250,15 +222,16 @@ export default function AboutPage() {
               <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--primary)', display: 'block', marginBottom: 4 }}>
                 PROJECT FACULTY GUIDE
               </span>
-              <h4 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>Faculty Project Guide</h4>
-              <p style={{ margin: '0 0 2px', fontSize: 12, color: 'var(--text-secondary)' }}>Department of Computer Science & Engineering</p>
+              <h4 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>Mr. B. N. Kiran</h4>
+              <p style={{ margin: '0 0 2px', fontSize: 12, color: 'var(--text-secondary)' }}>Assistant Professor</p>
+              <p style={{ margin: '0 0 2px', fontSize: 12, color: 'var(--text-secondary)' }}>Department of Information Science & Engineering</p>
               <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)' }}>National Institute of Engineering (NIE), Mysuru</p>
             </div>
 
             <div style={{ padding: 12, borderRadius: 10, background: 'var(--primary-glow)', border: '1px solid var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <span style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block' }}>DEGREE & ACADEMIC YEAR</span>
-                <strong style={{ fontSize: 13, color: 'var(--primary)' }}>B.E. Computer Science & Engineering (2026–2027)</strong>
+                <strong style={{ fontSize: 13, color: 'var(--primary)' }}>B.E. Information Science & Engineering (2026–2027)</strong>
               </div>
               <Badge variant="success">Final Capstone</Badge>
             </div>

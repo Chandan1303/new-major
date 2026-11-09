@@ -24,9 +24,18 @@ export default function VarietyGrowingGuidePage() {
   const [selectedCode, setSelectedCode] = useState(selectedField?.sugarcane_variety || '');
   const [state, setState] = useState(selectedFarm?.state || '');
   const [stateVarietyCodes, setStateVarietyCodes] = useState(null);
+  const [availableStates, setAvailableStates] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    let live = true;
+    geographyApi.getStates()
+      .then(response => { if (live) setAvailableStates(response.data?.states || []); })
+      .catch(() => { if (live) setAvailableStates([]); });
+    return () => { live = false; };
+  }, []);
 
   useEffect(() => {
     let live = true;
@@ -58,7 +67,16 @@ export default function VarietyGrowingGuidePage() {
     return () => { live = false; };
   }, [state]);
 
-  const stateOptions = useMemo(() => [...new Set(varieties.flatMap(item => textList(item.states || item.recommended_states)))].sort(), [varieties]);
+  const stateOptions = useMemo(() => availableStates
+    .map(item => typeof item === 'string' ? item : item?.name)
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b)), [availableStates]);
+
+  useEffect(() => {
+    if (availableStates.length && state && !stateOptions.some(item => item.toLocaleLowerCase() === state.toLocaleLowerCase())) {
+      setState('');
+    }
+  }, [availableStates, state, stateOptions]);
   const regionalVarieties = state
     ? stateVarietyCodes
       ? stateVarietyCodes.map(code => varieties.find(item => (item.variety_code || item.code || '').toLocaleLowerCase() === code.toLocaleLowerCase()) || {

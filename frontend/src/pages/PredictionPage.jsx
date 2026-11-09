@@ -44,7 +44,7 @@ import Badge from '../components/ui/Badge';
 import SimulatorPage from './SimulatorPage';
 import { useAuth } from '../context/AuthContext';
 import { useField } from '../context/FieldContext';
-import { mlApi, predictionApi, farmApi, weatherApi, irrigationApi, soilApi, varietyApi, request } from '../services/api';
+import { mlApi, predictionApi, farmApi, weatherApi, irrigationApi, soilApi, varietyApi, geographyApi, request } from '../services/api';
 import toast, { Toaster } from 'react-hot-toast';
 // Static constants
 const SOIL_TYPES = ['Black Soil', 'Alluvial Soil', 'Red Loam', 'Clay Loam', 'Sandy Loam'];
@@ -370,8 +370,7 @@ export default function PredictionPage() {
   useEffect(() => {
     const loadStates = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/geography/states');
-        const data = await response.json();
+        const data = await geographyApi.getStates();
         if (data.success) {
           setStates(data.data.states.map(s => s.name));
         }
@@ -392,8 +391,7 @@ export default function PredictionPage() {
       
       setLoadingGeography(true);
       try {
-        const response = await fetch(`http://localhost:5000/api/geography/districts?state=${encodeURIComponent(formData.state)}`);
-        const data = await response.json();
+        const data = await geographyApi.getDistricts(formData.state);
         if (data.success) {
           setDistricts(data.data.districts);
           // Auto-select first district if current district is not in list
@@ -421,8 +419,7 @@ export default function PredictionPage() {
       if (!formData.state) return;
       
       try {
-        const response = await fetch(`http://localhost:5000/api/geography/varieties?state=${encodeURIComponent(formData.state)}`);
-        const data = await response.json();
+        const data = await geographyApi.getVarieties(formData.state);
         if (data.success) {
           setVarieties(data.data.varieties);
           // Auto-select first variety if current variety is not in list

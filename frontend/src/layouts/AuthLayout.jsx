@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import AuthThemeSwitcher from '../components/AuthThemeSwitcher';
 import Brand from '../components/Brand';
+import brandLogo from '../assets/logo.png';
 
 export default function AuthLayout({ children, compact = false, variant = 'legacy' }) {
   const [theme, setTheme] = useState(() => {
@@ -97,7 +98,7 @@ export default function AuthLayout({ children, compact = false, variant = 'legac
             <Link to="/" className="auth-brand-link" aria-label="SugarYield AI Home">
               <div className="auth-logo-badge">
                 <div className="auth-logo-pulse-ring" />
-                <Sprout size={22} className="auth-logo-sprout-icon" />
+                <img src={brandLogo} alt="" className="auth-logo-image" />
               </div>
               <div className="auth-brand-text">
                 <span className="auth-brand-title">
@@ -189,7 +190,7 @@ export default function AuthLayout({ children, compact = false, variant = 'legac
           <div className="mobile-brand">
             <Link to="/" className="auth-brand-link">
               <div className="auth-logo-badge">
-                <Sprout size={20} color="#ffffff" />
+                <img src={brandLogo} alt="" className="auth-logo-image" />
               </div>
               <div className="auth-brand-text">
                 <span className="auth-brand-title">SugarYield AI</span>

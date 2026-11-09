@@ -167,6 +167,12 @@
   color: #ffffff;
 }
 
+.auth-logo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .auth-brand-text {
   display: flex;
   flex-direction: column;

@@ -230,7 +230,7 @@ export default function YieldLossPage() {
                 unit="t/ha"
                 icon={Sparkles}
                 color="emerald"
-                subtitle="Dual-model forecast"
+                subtitle="Random Forest final yield"
               />
               <StatCard
                 label="Estimated Yield Deficit"

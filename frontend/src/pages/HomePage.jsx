@@ -56,7 +56,7 @@ export default function HomePage() {
     {
       icon: Sparkles,
       title: 'AI Yield Forecasting',
-      desc: 'High-precision sugarcane yield predictions utilizing trained XGBoost and Random Forest ensemble models with confidence scoring.',
+      desc: 'Sugarcane yield forecasts use Random Forest as the final model, with XGBoost comparisons and model-agreement confidence.',
       path: '/prediction',
       color: '#10b981',
       tag: 'Machine Learning',
@@ -108,8 +108,8 @@ export default function HomePage() {
     },
     {
       step: '03',
-      title: 'Ensemble ML Inference',
-      desc: 'Trained XGBoost and Random Forest algorithms predict expected cane yield (t/ha) with confidence intervals.',
+      title: 'Dual-Model Evaluation',
+      desc: 'Both models evaluate each forecast; Random Forest provides the final cane yield and XGBoost remains a comparison.',
       icon: Cpu,
       highlight: 'Cross-Validated Models'
     },
@@ -188,7 +188,7 @@ export default function HomePage() {
             <p className="hero-subtitle">
               An enterprise-grade, data-driven agricultural decision support platform engineered for Indian sugarcane farming.
               Forecast harvest tonnage, track phenological crop growth, diagnose soil health, and optimize high-yielding
-              cane varieties using calibrated machine learning ensemble models.
+              cane varieties with Random Forest final forecasts and XGBoost comparisons.
             </p>
 
             <div className="hero-actions">
@@ -206,7 +206,7 @@ export default function HomePage() {
             <div className="hero-trust-bar">
               <div className="trust-item">
                 <span className="trust-dot" />
-                <span>XGBoost + RF Ensemble</span>
+                <span>Random Forest Final · XGBoost Comparison</span>
               </div>
               <div className="trust-separator">•</div>
               <div className="trust-item">
@@ -228,7 +228,7 @@ export default function HomePage() {
                   <span className="htc-live-dot" />
                   <span className="htc-title">Live Agronomic Telemetry</span>
                 </div>
-                <span className="htc-badge">Ensemble Active</span>
+                <span className="htc-badge">Dual Models Active</span>
               </div>
 
               <div className="htc-gauge-section">

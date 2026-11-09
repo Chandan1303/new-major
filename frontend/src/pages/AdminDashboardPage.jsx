@@ -450,7 +450,7 @@ export default function AdminDashboardPage() {
                 <BarChart
                   data={[
                     { name: 'Random Forest Regressor (Primary)', '5-Fold CV R²': 0.8005, 'Test R²': 0.7866 },
-                    { name: 'XGBoost Regressor (Consensus)', '5-Fold CV R²': 0.7936, 'Test R²': 0.7659 },
+                    { name: 'XGBoost Regressor (Comparison)', '5-Fold CV R²': 0.7936, 'Test R²': 0.7659 },
                   ]}
                   margin={{ top: 14, right: 30, left: 0, bottom: 0 }}
                 >
@@ -641,7 +641,7 @@ export default function AdminDashboardPage() {
                         <td>0.7659</td>
                         <td>9.17</td>
                         <td>12.65</td>
-                        <td><span className="badge badge-blue">Consensus</span></td>
+                        <td><span className="badge badge-blue">Comparison</span></td>
                       </tr>
                     </tbody>
                   </table>

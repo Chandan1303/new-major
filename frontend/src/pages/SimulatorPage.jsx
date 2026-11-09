@@ -260,7 +260,7 @@ export default function SimulatorPage({ embedded = false, forecast = null }) {
             </div>
             <h1 className="page-title" style={{ margin: '0 0 6px' }}>What-If Yield Scenario Simulator</h1>
             <p className="page-subtitle" style={{ margin: 0, color: 'var(--text-secondary)' }}>
-              Simulate climatic, irrigation, and edaphic stresses in real time with our dual Random Forest & XGBoost model consensus.
+              Simulate climatic, irrigation, and soil scenarios using Random Forest; XGBoost remains active for comparison in yield forecasts.
             </p>
           </div>
           <div className="header-actions">
@@ -459,10 +459,10 @@ export default function SimulatorPage({ embedded = false, forecast = null }) {
                   Comparative Climatic & Edaphic Perturbation Graph
                 </h3>
                 <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                  Ensemble ML projections relative to active baseline
+                  Random Forest projections relative to the active baseline
                 </span>
               </div>
-              <Badge variant="success">Consensus Model Projections</Badge>
+              <Badge variant="success">Random Forest Projections</Badge>
             </div>
 
             <ResponsiveContainer width="100%" height={300}>

@@ -23,7 +23,7 @@ const technologies = [
 ];
 
 const objectives = [
-  { n: '01', title: 'Deterministic Yield Forecasting', desc: 'Dual-model consensus (Random Forest + XGBoost) trained strictly on grounded agronomic & meteorological telemetry.' },
+  { n: '01', title: 'Deterministic Yield Forecasting', desc: 'Random Forest produces final yields; XGBoost runs alongside it for comparison on agronomic and meteorological inputs.' },
   { n: '02', title: '6-Stage Phenological Tracking', desc: 'Field-level phenology from Sett Planting through Ripening and Harvest with active timeline milestones.' },
   { n: '03', title: 'Agro-Meteorological Risk Monitoring', desc: 'Real-time thermal degrees, precipitation deficits, and air moisture tracking across growth stages.' },
   { n: '04', title: 'Edaphic Soil Chemistry & NPK Auditing', desc: 'Continuous evaluation of soil pH, organic carbon, and moisture dynamics tailored to sugarcane cultivars.' },

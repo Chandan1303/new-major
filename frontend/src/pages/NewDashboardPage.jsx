@@ -402,7 +402,7 @@ export default function NewDashboardPage() {
             unit="t/ha"
             change={undefined}
             color="#10b981"
-            subtitle="Dual-model calibrated forecast"
+            subtitle="Random Forest final yield; XGBoost comparison"
             onClick={() => navigate(predictionPath())}
           />
           <StatCard

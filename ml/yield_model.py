@@ -65,8 +65,10 @@ class YieldPredictionEngine:
         with open(self.models_dir / "model_metadata.json", "r", encoding="utf-8") as f:
             self.metadata = json.load(f)
 
-        self.best_model_name = self.metadata.get("best_model", "random_forest")
-        self.best_model = self.rf_model if self.best_model_name == "random_forest" else self.xgb_model
+        # Both estimators remain active for comparison, but Random Forest is
+        # the production source for final yield outputs and what-if scenarios.
+        self.best_model_name = "random_forest"
+        self.best_model = self.rf_model
 
         self.varieties = ["Co 86032", "Co 0238", "CoC 671", "Co 99004", "CoM 0265", "Co 94012", "Co 419", "Co 62175"]
         
@@ -185,7 +187,7 @@ class YieldPredictionEngine:
         """
         Runs real ML inference using trained Random Forest and XGBoost models.
         Applies season intelligence multipliers for variety-season optimization.
-        Returns dual-model comparison with automatic best selection.
+        Returns both model estimates and uses Random Forest for the final yield.
         """
         X = self.encode_input(raw_input)
 
@@ -205,14 +207,10 @@ class YieldPredictionEngine:
         rf_val = rf_base * season_multiplier
         xgb_val = xgb_base * season_multiplier
 
-        # Use the higher of the two trained model estimates as the forecast.
-        # Keep both outputs and their weighted blend available for comparison.
-        if xgb_val > rf_val:
-            selected_model = "XGBoost"
-            selected_val = xgb_val
-        else:
-            selected_model = "Random Forest"
-            selected_val = rf_val
+        # Random Forest is the final production forecast. XGBoost still runs
+        # and its estimate remains available for the dual-model comparison.
+        selected_model = "Random Forest"
+        selected_val = rf_val
 
         primary_val = round(selected_val, 2)
         ensemble_val = round((rf_val * 0.55 + xgb_val * 0.45), 2)
@@ -247,7 +245,7 @@ class YieldPredictionEngine:
         )
 
         # Expected range bounds
-        mae = self.metadata.get("metrics", {}).get(self.best_model_name, {}).get("MAE", 8.84)
+        mae = self.metadata.get("metrics", {}).get("random_forest", {}).get("MAE", 8.84)
         low_bound = round(max(30.0, primary_val - (mae * 0.9)), 2)
         high_bound = round(primary_val + (mae * 0.9), 2)
 
@@ -321,7 +319,7 @@ class YieldPredictionEngine:
 
         return {
             "is_model_estimate": True,
-            "disclaimer": "These projections are model-based scenario estimates derived from trained Random Forest and XGBoost regressions, not guaranteed outcomes.",
+            "disclaimer": "These projections are Random Forest scenario estimates. XGBoost remains active for comparison. Model outputs are estimates, not guaranteed outcomes.",
             "base_prediction": round(base_pred, 2),
             "scenario_prediction": round(scen_pred, 2),
             "difference": diff,
@@ -345,7 +343,7 @@ class YieldPredictionEngine:
             season_multiplier = self.season_intel.get_season_multiplier(variety, season)
             rf_val *= season_multiplier
             xgb_val *= season_multiplier
-        primary = max(rf_val, xgb_val)
+        primary = rf_val
         confidence = self.calculate_confidence(rf_val, xgb_val, raw_input)
 
         positives = []
@@ -471,7 +469,7 @@ class YieldPredictionEngine:
             confidence_reasons.append("One or more parameters deviate toward marginal ranges of the training corpus.")
 
         # Top feature importances
-        model_obj = self.xgb_model if xgb_val > rf_val else self.rf_model
+        model_obj = self.rf_model
         raw_importances = dict(zip(self.feature_names, model_obj.feature_importances_.tolist()))
         sorted_factors = sorted(raw_importances.items(), key=lambda x: x[1], reverse=True)
 
@@ -491,7 +489,7 @@ class YieldPredictionEngine:
                 for k, v in sorted_factors
             ],
             "summary": (
-                f"The AI model forecasts a sugarcane yield of {round(primary, 1)} t/ha with {confidence}% confidence. "
+                f"Random Forest forecasts a sugarcane yield of {round(primary, 1)} t/ha with {confidence}% confidence. "
                 f"Prediction is primarily driven by {sorted_factors[0][0].replace('_', ' ').title()} ({sorted_factors[0][1]*100:.1f}%) "
                 f"and {sorted_factors[1][0].replace('_', ' ').title()} ({sorted_factors[1][1]*100:.1f}%)."
             )

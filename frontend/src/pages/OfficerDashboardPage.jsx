@@ -306,7 +306,7 @@ export default function OfficerDashboardPage() {
                 <div className="dash-panel-header">
                   <div>
                     <h3>Regional Prediction Monitoring</h3>
-                    <p className="text-xs text-gray-500">Live feed of yield forecasts computed by the Random Forest / XGBoost consensus model.</p>
+                    <p className="text-xs text-gray-500">Live feed of Random Forest final yield forecasts, with XGBoost retained for model comparison.</p>
                   </div>
                   <button className="btn-primary" onClick={() => navigate('/prediction')}>New Prediction →</button>
                 </div>

@@ -735,7 +735,7 @@ export default function PredictionPage() {
             </span>
             <h1 className="page-title">AI Sugarcane Yield Forecasting</h1>
             <p className="page-subtitle">
-              Dual-model agronomic prediction engine powered by calibrated <strong>Random Forest & XGBoost Regressors</strong>.
+              Both trained models are evaluated; <strong>Random Forest supplies the final yield</strong>, with XGBoost retained for comparison.
               Pure soil, weather & varietal features without NDVI/satellite dependencies.
             </p>
           </div>
@@ -821,7 +821,7 @@ export default function PredictionPage() {
                   <div>
                     <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>Agronomic Input Parameters (11 Multi-Sensor Factors)</h3>
                     <p style={{ margin: '3px 0 0', fontSize: 12.5, color: 'var(--text-muted)' }}>
-                      Evaluated simultaneously by trained Random Forest (R²=0.80) and XGBoost (R²=0.79) algorithms.
+                      Both models evaluate these inputs. Random Forest (lower validation RMSE) supplies the final result; XGBoost remains a comparison.
                     </p>
                   </div>
                   <button
@@ -1198,7 +1198,7 @@ export default function PredictionPage() {
                     )}
                   </button>
                   <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                    Calculated using trained ensemble models and saved directly into MySQL database.
+                    Final yield is calculated by Random Forest; XGBoost comparison and model agreement are saved with the prediction.
                   </span>
                 </div>
               </div>
@@ -1237,7 +1237,7 @@ export default function PredictionPage() {
                     <div>
                       <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(52, 211, 153, 0.15)', border: '1px solid rgba(52, 211, 153, 0.3)', padding: '4px 10px', borderRadius: 9999, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#6ee7b7', fontWeight: 700, marginBottom: 12 }}>
                         <Sparkles size={12} />
-                        FORECAST GENERATED VIA {result.model_used?.toUpperCase() || 'DUAL ENSEMBLE'}
+                        FINAL FORECAST VIA {result.model_used?.toUpperCase() || 'RANDOM FOREST'}
                       </div>
                       <h2 style={{ fontSize: 40, margin: '0 0 8px', color: '#ffffff', fontWeight: 800, letterSpacing: '-0.02em', display: 'flex', alignItems: 'baseline', gap: 10 }}>
                         {result.predicted_yield} <span style={{ fontSize: 20, fontWeight: 500, color: '#a7f3d0' }}>tonnes / hectare</span>
@@ -1329,15 +1329,15 @@ export default function PredictionPage() {
                   </div>
                 </div>
 
-                {/* Model Consensus & Comparison */}
+                {/* Dual-model comparison and agreement */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 20, marginBottom: 24 }}>
                   <div className="card" style={{ padding: 22 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                      <h3 style={{ margin: 0, fontSize: 16 }}>Dual Algorithm Consensus</h3>
+                      <h3 style={{ margin: 0, fontSize: 16 }}>Dual-Model Evaluation</h3>
                       <Badge variant="success">Trained Weights</Badge>
                     </div>
                     <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '0 0 16px' }}>
-                      Both algorithms evaluate your telemetry simultaneously without hardcoded formulas.
+                      Both algorithms evaluate your telemetry. Random Forest supplies the final yield; XGBoost provides a comparison estimate.
                     </p>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                       <div style={{ padding: 14, borderRadius: 12, background: 'var(--border-subtle)', border: '1px solid var(--border)' }}>
@@ -1358,7 +1358,7 @@ export default function PredictionPage() {
                     </div>
 
                     <div style={{ marginTop: 14, padding: 10, background: 'rgba(14, 165, 233, 0.08)', borderRadius: 8, fontSize: 12.5, color: '#0284c7', border: '1px solid rgba(14, 165, 233, 0.2)' }}>
-                      Model agreement is <strong>{result.model_agreement}%</strong>. Forecast uses the higher estimate ({result.model_used}: {result.predicted_yield} t/ha). Prediction record saved under ID #{result.prediction_id}.
+                      Model agreement is <strong>{result.model_agreement}%</strong>. Final forecast uses Random Forest ({result.predicted_yield} t/ha); XGBoost remains a comparison. Prediction record saved under ID #{result.prediction_id}.
                     </div>
                   </div>
 

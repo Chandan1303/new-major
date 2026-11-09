@@ -348,7 +348,7 @@ export default function ReportsPage() {
                 unit="t/ha"
                 icon={Sparkles}
                 color="emerald"
-                subtitle="Dual-model consensus"
+                subtitle="Random Forest final yield"
               />
               <StatCard
                 label="Expected Harvest"
@@ -364,7 +364,7 @@ export default function ReportsPage() {
                 unit="%"
                 icon={ShieldCheck}
                 color="blue"
-                subtitle="Ensemble validation"
+                subtitle="Dual-model agreement"
               />
               <StatCard
                 label="Risk Tier"

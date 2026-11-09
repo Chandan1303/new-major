@@ -114,9 +114,10 @@ export default function SoilPage() {
   }
 
   const f = selected;
-  const healthColor = f?.health_score >= 80 ? '#10b981' : f?.health_score >= 65 ? '#f59e0b' : '#ef4444';
+  const hasSoilData = Boolean(f?.data_available && f?.health_score != null);
+  const healthColor = !hasSoilData ? '#94a3b8' : f.health_score >= 80 ? '#10b981' : f.health_score >= 65 ? '#f59e0b' : '#ef4444';
 
-  const radarData = f ? [
+  const radarData = hasSoilData ? [
     { subject: 'pH Balance',       value: f.health_score >= 80 ? 92 : 62 },
     { subject: 'Moisture Retention', value: Math.min(100, Number(f.soil_moisture) + 10) },
     { subject: 'Agronomic Match',   value: f.suitability === 'Highly Suitable' ? 95 : f.suitability === 'Suitable' ? 78 : 55 },
@@ -155,7 +156,7 @@ export default function SoilPage() {
             <StatCard
               icon={FlaskConical}
               label="Avg Health Score"
-              value={`${data.summary.avg_health_score}/100`}
+              value={data.summary.avg_health_score == null ? 'Not available' : `${data.summary.avg_health_score}/100`}
               color="#10b981"
               subtitle="Composite index score"
             />
@@ -216,8 +217,8 @@ export default function SoilPage() {
                   <h3 style={{ margin: 0, fontSize: 16 }}>{f.name} — Physicochemical Profile</h3>
                   <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{f.farm_name}</span>
                 </div>
-                <Badge variant={f.health_label?.toLowerCase() === 'excellent' ? 'success' : 'warning'}>
-                  {f.health_label} Health
+                <Badge variant={hasSoilData && f.health_label?.toLowerCase() === 'excellent' ? 'success' : 'warning'}>
+                  {hasSoilData ? `${f.health_label} Health` : 'Measurements needed'}
                 </Badge>
               </div>
 
@@ -229,7 +230,7 @@ export default function SoilPage() {
                 <div>
                   <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>{f.soil_type}</div>
                   <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                    Cane Suitability: <strong style={{ color: 'var(--primary)' }}>{f.suitability}</strong>
+                    Cane Suitability: <strong style={{ color: 'var(--primary)' }}>{f.suitability || 'Pending measurements'}</strong>
                   </div>
                 </div>
               </div>
@@ -237,12 +238,12 @@ export default function SoilPage() {
               {/* 6 Key Soil Metrics */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 18 }}>
                 {[
-                  { label: 'Soil pH', value: Number(f.soil_ph).toFixed(1), color: f.ph_status === 'Optimal' ? '#10b981' : '#f59e0b' },
-                  { label: 'Moisture', value: `${Number(f.soil_moisture).toFixed(0)}%`, color: '#0ea5e9' },
-                  { label: 'Health Score', value: `${f.health_score}/100`, color: healthColor },
-                  { label: 'pH Status', value: f.ph_status, color: f.ph_status === 'Optimal' ? '#10b981' : '#f59e0b' },
-                  { label: 'Moisture Status', value: f.moisture_status, color: '#0ea5e9' },
-                  { label: 'Suitability', value: f.suitability, color: '#10b981' },
+                  { label: 'Soil pH', value: f.soil_ph == null ? 'Not recorded' : Number(f.soil_ph).toFixed(1), color: f.ph_status === 'Optimal' ? '#10b981' : '#f59e0b' },
+                  { label: 'Moisture', value: f.soil_moisture == null ? 'Not recorded' : `${Number(f.soil_moisture).toFixed(0)}%`, color: '#0ea5e9' },
+                  { label: 'Health Score', value: f.health_score == null ? 'Not available' : `${f.health_score}/100`, color: healthColor },
+                  { label: 'pH Status', value: f.ph_status || 'Not assessed', color: f.ph_status === 'Optimal' ? '#10b981' : '#f59e0b' },
+                  { label: 'Moisture Status', value: f.moisture_status || 'Not assessed', color: '#0ea5e9' },
+                  { label: 'Suitability', value: f.suitability || 'Not assessed', color: '#10b981' },
                 ].map(m => (
                   <div key={m.label} style={{ background: 'var(--bg-panel)', padding: '10px 12px', borderRadius: 10, border: '1px solid var(--border)', textAlign: 'center' }}>
                     <div style={{ fontSize: 15, fontWeight: 700, color: m.color }}>{m.value}</div>
@@ -277,8 +278,12 @@ export default function SoilPage() {
                 <Badge variant="success">Radial Evaluation</Badge>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
-                <ScoreRing score={f.health_score} label="HEALTH INDEX" color={healthColor} />
-                <ResponsiveContainer width="100%" height={210}>
+                {hasSoilData ? <ScoreRing score={f.health_score} label="HEALTH INDEX" color={healthColor} /> : (
+                  <p style={{ maxWidth: 440, textAlign: 'center', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                    This field has no current pH and moisture measurements. Add those values when editing the field to calculate its soil health and suitability.
+                  </p>
+                )}
+                {hasSoilData && <ResponsiveContainer width="100%" height={210}>
                   <RadarChart data={radarData}>
                     <PolarGrid stroke="rgba(226, 232, 240, 0.6)" />
                     <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
@@ -286,7 +291,7 @@ export default function SoilPage() {
                     <Radar name="Soil" dataKey="value" stroke="#10b981" fill="#10b981" fillOpacity={0.25} />
                     <Tooltip />
                   </RadarChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer>}
               </div>
             </div>
           </div>

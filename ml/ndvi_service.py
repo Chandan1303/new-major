@@ -49,7 +49,17 @@ class NDVIService:
         """
         self.use_gee = use_gee and GEE_AVAILABLE
         self.base_dir = Path(__file__).resolve().parent.parent
-        self.historical_data_dir = self.base_dir / "cleaned_data"
+        # NDVI files exist in both the legacy root folder and the organized
+        # datasets folder. Prefer the legacy path, but search both so the
+        # service works with either repository/deployment layout.
+        self.historical_data_dirs = [
+            self.base_dir / "cleaned_data",
+            self.base_dir / "datasets" / "cleaned_data",
+        ]
+        self.historical_data_dir = next(
+            (directory for directory in self.historical_data_dirs if directory.is_dir()),
+            self.historical_data_dirs[0],
+        )
         
         # NDVI Health Classification Thresholds (Research-based)
         self.health_thresholds = {
@@ -448,12 +458,30 @@ class NDVIService:
             "Dehradun": "NDVI_dehradun_cleaned.csv",
         }
         
-        # Try to find matching file
+        # Try the explicit mapping first, then derive the usual filename from
+        # the selected district. This supports districts added to geography
+        # data without requiring another hard-coded mapping entry.
         ndvi_file = None
         for region, filename in district_to_region_file.items():
             if district.lower() in region.lower() or region.lower() in district.lower():
-                ndvi_file = self.historical_data_dir / filename
+                ndvi_file = next(
+                    (directory / filename for directory in self.historical_data_dirs
+                     if (directory / filename).is_file()),
+                    None,
+                )
                 break
+
+        if ndvi_file is None:
+            district_name = district.strip()
+            if district_name.lower().endswith(" district"):
+                district_name = district_name[:-9].strip()
+            district_slug = "_".join(district_name.lower().replace("-", " ").split())
+            expected_name = f"NDVI_{district_slug}_cleaned.csv"
+            ndvi_file = next(
+                (directory / expected_name for directory in self.historical_data_dirs
+                 if (directory / expected_name).is_file()),
+                None,
+            )
         
         if ndvi_file and ndvi_file.exists():
             try:
@@ -480,6 +508,40 @@ class NDVIService:
                 
             except Exception as e:
                 return {"error": f"Failed to load historical data: {str(e)}"}
+
+        # As a final fallback, use the combined historical file and select
+        # rows for this district (case-insensitively).
+        for directory in self.historical_data_dirs:
+            combined_file = directory / "NDVI_all_districts_complete.csv"
+            if not combined_file.is_file():
+                continue
+            try:
+                df = pd.read_csv(combined_file)
+                if "district" not in df.columns or "ndvi" not in df.columns:
+                    continue
+                district_names = {district.strip().casefold()}
+                if district.strip().casefold().endswith(" district"):
+                    district_names.add(district.strip()[:-9].strip().casefold())
+                df = df[df["district"].astype(str).str.strip().str.casefold().isin(district_names)]
+                if df.empty:
+                    continue
+
+                stats = {
+                    "source": "Historical Data",
+                    "region": district,
+                    "total_records": len(df),
+                    "ndvi_mean": float(df["ndvi"].mean()),
+                    "ndvi_median": float(df["ndvi"].median()),
+                    "ndvi_std": float(df["ndvi"].std()),
+                    "ndvi_min": float(df["ndvi"].min()),
+                    "ndvi_max": float(df["ndvi"].max()),
+                    "ndvi_p25": float(df["ndvi"].quantile(0.25)),
+                    "ndvi_p75": float(df["ndvi"].quantile(0.75)),
+                }
+                stats["average_health"] = self.classify_crop_health(stats["ndvi_mean"])
+                return {"success": True, "data": stats}
+            except Exception as e:
+                return {"error": f"Failed to load combined historical data: {str(e)}"}
         
         return {
             "error": "No historical NDVI data available for this location",

@@ -10,3 +10,5 @@
 # NDVI history needed in production is already included from cleaned_data/.
 datasets/
 satellite_data/
+frontend/
+tableau_australia_dataset/

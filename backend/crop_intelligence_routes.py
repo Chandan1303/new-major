@@ -53,6 +53,12 @@ ALERT_STATUSES = {"new", "acknowledged", "monitoring", "resolved", "unconfirmed"
 
 @crop_intelligence_bp.before_request
 def authenticate_crop_intelligence():
+    # Browsers send unauthenticated OPTIONS preflight requests before
+    # credentialed cross-origin requests. Let Flask-CORS answer the preflight;
+    # the actual GET/POST/PATCH/DELETE request remains authenticated below.
+    if request.method == "OPTIONS":
+        return None
+
     token = request.headers.get("Authorization", "")
     token = token[7:].strip() if token.startswith("Bearer ") else (request.cookies.get("token") or request.cookies.get("jwt"))
     if not token:

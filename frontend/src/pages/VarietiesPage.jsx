@@ -124,7 +124,7 @@ export default function VarietiesPage() {
   return (
     <AppLayout>
       <Toaster position="top-right" />
-      <div className="page-container">
+      <div className="page-container variety-intelligence-page">
         {/* Header */}
         <div className="page-header">
           <div>
@@ -135,7 +135,7 @@ export default function VarietiesPage() {
             </p>
           </div>
           {selected.length >= 2 && (
-            <button className="btn-primary" onClick={runComparison}>
+            <button className="btn-primary variety-compare-cta" onClick={runComparison}>
               Compare {selected.length} Varieties →
             </button>
           )}
@@ -161,12 +161,12 @@ export default function VarietiesPage() {
         {/* ─── TAB 1: ALL VARIETIES ─── */}
         {tab === 'all' && (
           <>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+            <div className="variety-quick-compare" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <p className="page-hint" style={{ margin: 0 }}>
                 Select up to 3 cultivars to compare side-by-side across agronomic traits, risk, and yield potential.
               </p>
               <button
-                className="btn-sm btn-outline"
+                  className="btn-sm btn-outline variety-compare-button"
                 onClick={() => {
                   setSelected(['Co 86032', 'Co 0238', 'CoM 0265']);
                   runComparison();
@@ -388,7 +388,7 @@ export default function VarietiesPage() {
                   </div>
 
                   {comparison.recommended && (
-                    <div style={{ marginTop: 16, padding: '14px 18px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div className="variety-forecast-row" style={{ marginTop: 16, padding: '14px 18px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
                         <strong style={{ color: '#166534', fontSize: 14 }}>
                           🏆 Highest Potential Yield: {comparison.recommended}
@@ -398,7 +398,7 @@ export default function VarietiesPage() {
                         </p>
                       </div>
                       <button
-                        className="btn-sm btn-primary"
+                        className="btn-sm btn-primary variety-forecast-button"
                         onClick={() => navigate(`/prediction?variety=${encodeURIComponent(comparison.recommended)}`)}
                       >
                         Forecast with {comparison.recommended} →
@@ -594,7 +594,7 @@ export default function VarietiesPage() {
                         {r.why_recommended || `High yield stability under regional climate with strong resistance to adverse moisture swings.`}
                       </div>
 
-                      <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div className="variety-forecast-row" style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#64748b' }}>
                           <span>Risk: <strong>{r.risk || 'Low'}</strong></span>
                           <span>Drought: <strong>{r.drought_tolerance || 'High'}</strong></span>
@@ -602,7 +602,7 @@ export default function VarietiesPage() {
                         </div>
 
                         <button
-                          className="btn-sm btn-outline"
+                          className="btn-sm btn-outline variety-forecast-button"
                           onClick={() => navigate(`/prediction?variety=${encodeURIComponent(r.code || r.name)}`)}
                         >
                           Forecast with {r.code || r.name} →

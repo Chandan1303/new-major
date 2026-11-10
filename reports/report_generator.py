@@ -18,6 +18,16 @@ from datetime import datetime
 from pathlib import Path
 
 
+def _optional_float(value):
+    """Convert a recorded numeric value without failing on blank soil data."""
+    if value is None or value == "":
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
 class AgronomicReportGenerator:
     def __init__(self, output_dir=None):
         self.output_dir = Path(output_dir) if output_dir else Path(__file__).resolve().parent
@@ -28,14 +38,20 @@ class AgronomicReportGenerator:
 
         farm_name = farm_data.get("name", "Demo Sugarcane Farm")
         location = farm_data.get("location", "Kolhapur, Maharashtra")
-        area = float(field_data.get("area") if field_data else farm_data.get("total_area", 5.0))
+        raw_area = field_data.get("area") if field_data else farm_data.get("total_area", 5.0)
+        area = _optional_float(raw_area)
+        if area is None:
+            area = _optional_float(farm_data.get("total_area")) or 5.0
         variety = (field_data.get("sugarcane_variety") if field_data else None) or (prediction_data.get("variety") if prediction_data else "Co 86032")
 
-        pred_yield = float(prediction_data.get("predicted_yield", 88.5)) if prediction_data else 88.5
+        pred_yield = _optional_float(prediction_data.get("predicted_yield")) if prediction_data else None
+        pred_yield = 88.5 if pred_yield is None else pred_yield
         expected_prod = round(pred_yield * area, 2)
-        confidence = float(prediction_data.get("confidence", 91.2)) if prediction_data else 91.2
+        confidence = _optional_float(prediction_data.get("confidence")) if prediction_data else None
+        confidence = 91.2 if confidence is None else confidence
         risk_level = (prediction_data.get("risk") or prediction_data.get("risk_level") or "Low") if prediction_data else "Low"
-        loss_pct = float(prediction_data.get("loss_percentage") or prediction_data.get("expected_loss_pct") or 8.5) if prediction_data else 8.5
+        loss_pct = _optional_float(prediction_data.get("loss_percentage") or prediction_data.get("expected_loss_pct")) if prediction_data else None
+        loss_pct = 8.5 if loss_pct is None else loss_pct
 
         # Standard Sections
         farm_overview = {
@@ -48,11 +64,11 @@ class AgronomicReportGenerator:
         }
 
         soil_overview = soil_data or {
-            "soil_type": field_data.get("soil_type", "Black Soil") if field_data else "Black Soil",
-            "soil_ph": float(field_data.get("soil_ph", 7.2)) if field_data else 7.2,
-            "soil_moisture": float(field_data.get("soil_moisture", 62.0)) if field_data else 62.0,
-            "health_score": 88.0,
-            "suitability": "Highly Suitable"
+            "soil_type": field_data.get("soil_type") if field_data else "Not recorded",
+            "soil_ph": _optional_float(field_data.get("soil_ph")) if field_data else None,
+            "soil_moisture": _optional_float(field_data.get("soil_moisture")) if field_data else None,
+            "health_score": None,
+            "suitability": "Pending measurements"
         }
 
         weather_overview = weather_data or {
@@ -142,7 +158,11 @@ class AgronomicReportGenerator:
 
         elif report_type == "Soil Report":
             title = f"Soil Fertility & Health Assessment Report — {farm_name}"
-            summary = f"Soil health scored at {soil_overview.get('health_score', 85)}/100 ({soil_overview.get('soil_type', 'Black Soil')}, pH {soil_overview.get('soil_ph', 7.0)}), classified as {soil_overview.get('suitability', 'Highly Suitable')}."
+            health_score = soil_overview.get("health_score")
+            soil_ph = soil_overview.get("soil_ph")
+            score_text = f"{health_score}/100" if health_score is not None else "not assessed"
+            ph_text = soil_ph if soil_ph is not None else "not recorded"
+            summary = f"Soil health is {score_text} ({soil_overview.get('soil_type') or 'soil type not recorded'}, pH {ph_text}), classified as {soil_overview.get('suitability') or 'pending measurements'}."
             sections = {
                 "Field & Soil Profile": soil_overview,
                 "Nutrient Recommendations": {
@@ -151,8 +171,8 @@ class AgronomicReportGenerator:
                     "Potassium (K2O)": "80-120 kg/ha split between planting and grand growth"
                 },
                 "Soil Moisture Health": {
-                    "Current Moisture": f"{soil_overview.get('soil_moisture', 60)}%",
-                    "Status": "Adequate for active cane expansion"
+                    "Current Moisture": f"{soil_overview['soil_moisture']}%" if soil_overview.get("soil_moisture") is not None else "Not recorded",
+                    "Status": "Awaiting a current moisture measurement" if soil_overview.get("soil_moisture") is None else "Review alongside current field conditions"
                 }
             }
             recommendations = [
@@ -248,7 +268,7 @@ class AgronomicReportGenerator:
         json_path = self.output_dir / f"{report_id}.json"
         try:
             with open(json_path, "w", encoding="utf-8") as f:
-                json.dump(report, f, indent=2)
+            json.dump(report, f, indent=2, default=str)
         except Exception:
             pass
 

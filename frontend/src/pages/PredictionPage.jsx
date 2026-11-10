@@ -749,7 +749,7 @@ export default function PredictionPage() {
   return (
     <AppLayout>
       <Toaster position="top-right" />
-      <div className="page-container">
+      <div className="page-container yield-forecast-page">
         {/* Header */}
         <div className="page-header" style={{ marginBottom: 24 }}>
           <div>
@@ -763,7 +763,7 @@ export default function PredictionPage() {
               Pure soil, weather & varietal features without NDVI/satellite dependencies.
             </p>
           </div>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div className="forecast-tab-actions" style={{ display: 'flex', gap: 10 }}>
             <button
               className={`btn ${activeTab === 'predict' ? 'btn-primary' : 'btn-outline'}`}
               onClick={() => {
@@ -1880,7 +1880,7 @@ export default function PredictionPage() {
         {activeTab === 'history' && (
           <div className="history-flow">
             {/* Historical Trend Graph */}
-            <div className="card" style={{ marginBottom: 24, padding: 22 }}>
+            <div className="card prediction-history-chart" style={{ marginBottom: 24, padding: 22 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                 <div>
                   <h3 style={{ margin: 0, fontSize: 16 }}>Temporal Yield Progression</h3>
@@ -1911,8 +1911,8 @@ export default function PredictionPage() {
             </div>
 
             {/* Filter and Search Bar */}
-            <div className="card" style={{ marginBottom: 24, padding: 18 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
+            <div className="card history-filter-panel" style={{ marginBottom: 24, padding: 18 }}>
+              <div className="history-filters-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
                 <input
                   type="text"
                   placeholder="🔍 Search farm, field, location…"
@@ -1963,7 +1963,7 @@ export default function PredictionPage() {
             </div>
 
             {/* History Table */}
-            <div className="card" style={{ padding: 22 }}>
+            <div className="card prediction-history-table" style={{ padding: 22 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                 <h3 style={{ margin: 0, fontSize: 16 }}>Prediction History ({historyList.length})</h3>
                 <Badge variant="info">Persistent Storage</Badge>
@@ -1976,7 +1976,7 @@ export default function PredictionPage() {
                   No prediction records match your query.
                 </div>
               ) : (
-                <div style={{ overflowX: 'auto' }}>
+                <div className="prediction-history-table-scroll" style={{ overflowX: 'auto' }}>
                   <table>
                     <thead>
                       <tr>

@@ -21,6 +21,8 @@ const REPORT_TYPES = [
   { id: 'Complete Farm Intelligence Report', icon: FileText,    badge: 'purple',  label: 'Comprehensive Intelligence Dossier',desc: 'Full multi-dimensional dossier combining prediction, phenology, soil, weather, XAI, and advisory.' },
 ];
 
+const reportContent = report => report?.report_data || report?.data || report || {};
+
 export default function ReportsPage() {
   const { selectedFarm: ctxFarm, selectedField: ctxField } = useField();
   const [selectedType, setSelectedType] = useState(REPORT_TYPES[0].id);
@@ -32,6 +34,7 @@ export default function ReportsPage() {
   const [generating, setGenerating]       = useState(false);
   const [previewReport, setPreviewReport] = useState(null);
   const printRef = useRef(null);
+  const previewData = reportContent(previewReport);
 
   const printReport = () => {
     const cleanup = () => document.body.classList.remove('print-agronomic-report');
@@ -74,7 +77,7 @@ export default function ReportsPage() {
       };
 
       const res = await reportApi.generate(payload);
-      const repData = res.data?.data || res.data;
+      const repData = res?.data?.data || res?.data || res;
       setPreviewReport(repData);
       setPastReports(prev => [repData, ...prev]);
       toast.success(`${selectedType} compiled successfully!`);
@@ -134,7 +137,7 @@ export default function ReportsPage() {
   return (
     <AppLayout>
       <Toaster position="top-right" />
-      <div className="page-container">
+      <div className="page-container farm-reports-page">
         
         {/* Page Header */}
         <div className="page-header" style={{ marginBottom: 24 }}>
@@ -158,7 +161,7 @@ export default function ReportsPage() {
         </div>
 
         {/* Target Entity Selection Card */}
-        <div className="card" style={{ padding: 20, borderRadius: 16, border: '1px solid var(--border-color)', background: 'var(--card-bg)', marginBottom: 24 }}>
+        <div className="card report-target-panel" style={{ padding: 20, borderRadius: 16, border: '1px solid var(--border-color)', background: 'var(--card-bg)', marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
             <Building2 size={16} color="var(--primary)" />
             <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>Select Target Holding & Parcel</h3>
@@ -211,13 +214,14 @@ export default function ReportsPage() {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 14, marginBottom: 24 }}>
+        <div className="report-type-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 14, marginBottom: 24 }}>
           {REPORT_TYPES.map(rt => {
             const isSelected = selectedType === rt.id;
             const Icon = rt.icon;
             return (
               <div
                 key={rt.id}
+                className="report-type-card"
                 onClick={() => setSelectedType(rt.id)}
                 style={{
                   display: 'flex',
@@ -271,7 +275,7 @@ export default function ReportsPage() {
         {/* Generate Trigger Banner */}
         <div style={{ marginBottom: 24 }}>
           <button
-            className="btn-primary"
+            className="btn-primary report-generate-button"
             style={{ width: '100%', padding: '16px', fontSize: 15, justifyContent: 'center', gap: 10 }}
             onClick={() => handleGenerate('PREVIEW')}
             disabled={generating}
@@ -344,7 +348,7 @@ export default function ReportsPage() {
             <div className="dashboard-stats report-document-metrics" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: 24 }}>
               <StatCard
                 label="Predicted Yield"
-                value={previewReport.report_data?.sections?.['ML Yield Forecast']?.predicted_yield_tha ?? 88.5}
+                value={previewData.predicted_yield ?? previewData.sections?.['ML Yield Forecast']?.predicted_yield_tha ?? 88.5}
                 unit="t/ha"
                 icon={Sparkles}
                 color="emerald"
@@ -352,7 +356,7 @@ export default function ReportsPage() {
               />
               <StatCard
                 label="Expected Harvest"
-                value={previewReport.report_data?.sections?.['ML Yield Forecast']?.expected_production_tonnes ?? 442.5}
+                value={previewData.expected_production ?? previewData.sections?.['ML Yield Forecast']?.expected_production_tonnes ?? 442.5}
                 unit="tonnes"
                 icon={Building2}
                 color="teal"
@@ -360,7 +364,7 @@ export default function ReportsPage() {
               />
               <StatCard
                 label="Model Confidence"
-                value={previewReport.report_data?.sections?.['ML Yield Forecast']?.confidence_percentage ?? 91.2}
+                value={previewData.confidence ?? previewData.sections?.['ML Yield Forecast']?.confidence_percentage ?? 91.2}
                 unit="%"
                 icon={ShieldCheck}
                 color="blue"
@@ -368,7 +372,7 @@ export default function ReportsPage() {
               />
               <StatCard
                 label="Risk Tier"
-                value={previewReport.report_data?.sections?.['ML Yield Forecast']?.risk_level ?? 'Low'}
+                value={previewData.risk_level ?? previewData.sections?.['ML Yield Forecast']?.risk_level ?? 'Low'}
                 unit=""
                 icon={TrendingDown}
                 color="green"
@@ -377,9 +381,9 @@ export default function ReportsPage() {
             </div>
 
             {/* Detailed Dynamic Sections */}
-            {previewReport.report_data?.sections && (
+            {previewData.sections && (
               <div className="report-document-sections" style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
-                {Object.entries(previewReport.report_data.sections).map(([secName, secContent]) => (
+                {Object.entries(previewData.sections).map(([secName, secContent]) => (
                   <div className="report-document-section" key={secName} style={{ border: '1px solid var(--border-color)', borderRadius: 12, padding: 18, background: 'var(--bg-secondary)' }}>
                     <h4 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 12px', borderBottom: '1px solid var(--border-color)', paddingBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
                       <Layers size={15} color="var(--primary)" /> {secName}
@@ -411,7 +415,7 @@ export default function ReportsPage() {
                 <Sprout size={16} color="var(--primary)" /> Actionable Agronomic Directives
               </h4>
               <ul style={{ paddingLeft: 20, margin: 0, fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                {(previewReport.report_data?.recommendations || [
+                {(previewData.recommendations || [
                   'Maintain optimal furrow moisture to preserve genetic sucrose synthesis.',
                   'Scout for early shoot borer during grand growth node elongation.',
                   'Apply potassium top-dressing to increase stalk rigidity and drought resistance.'
@@ -434,7 +438,7 @@ export default function ReportsPage() {
         )}
 
         {/* Historical Archives Table */}
-        <div className="card" style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-color)', background: 'var(--card-bg)' }}>
+        <div className="card report-archive-panel" style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-color)', background: 'var(--card-bg)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
             <div>
               <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>Generated Intelligence Archives</h3>

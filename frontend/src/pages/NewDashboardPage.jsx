@@ -260,7 +260,7 @@ export default function NewDashboardPage() {
 
   return (
     <AppLayout>
-      <div className="page-container">
+      <div className="page-container farm-dashboard-page">
         {/* Header */}
         <div className="page-header dashboard-hero" style={{ marginBottom: 24 }}>
           <div>
@@ -548,8 +548,8 @@ export default function NewDashboardPage() {
         {/* TWO COLUMN CHARTS & ALERTS */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 20, marginBottom: 24 }}>
           {/* Yield Trend Area Chart */}
-          <div className="card" style={{ padding: '22px 24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div className="card multi-season-yield-panel" style={{ padding: '22px 24px' }}>
+            <div className="multi-season-yield-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700 }}>Multi-Season Yield Telemetry</h3>
                 <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Stored predictions; actual yield and benchmarks appear only when recorded</span>

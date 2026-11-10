@@ -95,7 +95,7 @@ export default function SoilPage() {
   if (error || !data?.fields?.length) {
     return (
       <AppLayout>
-        <div className="page-container">
+        <div className="page-container soil-health-page">
           <div className="page-header">
             <div>
               <span className="eyebrow"><Layers size={13} /> Soil Intelligence</span>
@@ -127,7 +127,7 @@ export default function SoilPage() {
 
   return (
     <AppLayout>
-      <div className="page-container">
+      <div className="page-container soil-health-page">
         {/* Header */}
         <div className="page-header" style={{ marginBottom: 24 }}>
           <div>
@@ -152,7 +152,7 @@ export default function SoilPage() {
 
         {/* Summary Metrics */}
         {data.summary && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
+          <div className="soil-health-summary-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
             <StatCard
               icon={FlaskConical}
               label="Avg Health Score"
@@ -185,7 +185,7 @@ export default function SoilPage() {
         )}
 
         {/* Field Selection Strip */}
-        <div className="card" style={{ padding: '12px 18px', marginBottom: 24 }}>
+        <div className="card soil-field-selector" style={{ padding: '12px 18px', marginBottom: 24 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 }}>
             Select Monitored Field Plot:
           </div>
@@ -209,7 +209,7 @@ export default function SoilPage() {
         </div>
 
         {f && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 20, marginBottom: 24 }}>
+          <div className="soil-health-panels" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 20, marginBottom: 24 }}>
             {/* Soil Profile Panel */}
             <div className="card" style={{ padding: 24 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -236,7 +236,7 @@ export default function SoilPage() {
               </div>
 
               {/* 6 Key Soil Metrics */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 18 }}>
+              <div className="soil-health-metric-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 18 }}>
                 {[
                   { label: 'Soil pH', value: f.soil_ph == null ? 'Not recorded' : Number(f.soil_ph).toFixed(1), color: f.ph_status === 'Optimal' ? '#10b981' : '#f59e0b' },
                   { label: 'Moisture', value: f.soil_moisture == null ? 'Not recorded' : `${Number(f.soil_moisture).toFixed(0)}%`, color: '#0ea5e9' },

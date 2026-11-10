@@ -3118,3 +3118,95 @@ html[data-theme="dark"] .auth-shell .form-content.auth-card input[type="text"]:-
   .field-parcel-card [style*="grid-template-columns: repeat(3, 1fr)"] > div { min-width: 0; overflow-wrap: anywhere; }
   .field-parcel-card [style*="grid-template-columns: repeat(3, 1fr)"] span:last-child { white-space: normal !important; }
 }
+
+/* Narrow-screen layouts for forecast, soil, variety, analytics, and reports. */
+@media (max-width: 680px) {
+  .yield-forecast-page .forecast-tab-actions { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; gap: 8px !important; }
+  .yield-forecast-page .forecast-tab-actions > button { min-width: 0; min-height: 44px; justify-content: center; padding: 8px 7px; font-size: 12px; }
+  .yield-forecast-page .history-flow > .card,
+  .yield-forecast-page .prediction-results > .card { padding: 15px !important; }
+  .yield-forecast-page .prediction-history-chart > div:first-child,
+  .yield-forecast-page .prediction-history-table > div:first-child { align-items: flex-start !important; flex-direction: column; gap: 8px; }
+  .yield-forecast-page .history-filter-panel { padding: 14px !important; }
+  .yield-forecast-page .history-filters-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 9px !important; }
+  .yield-forecast-page .prediction-history-table-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+  .yield-forecast-page .prediction-history-table-scroll table { min-width: 850px; }
+
+  .farm-dashboard-page .multi-season-yield-panel { padding: 16px !important; }
+  .farm-dashboard-page .multi-season-yield-header { align-items: stretch !important; flex-direction: column; gap: 10px; }
+  .farm-dashboard-page .multi-season-yield-header > div { min-width: 0; }
+  .farm-dashboard-page .multi-season-yield-header select,
+  .farm-dashboard-page .multi-season-yield-header button { width: 100%; min-height: 42px; justify-content: center; }
+
+  .soil-health-page .soil-health-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
+  .soil-health-page .soil-field-selector { padding: 14px !important; }
+  .soil-health-page .soil-field-selector > div:nth-child(2) { display: grid !important; grid-template-columns: minmax(0, 1fr); gap: 8px !important; }
+  .soil-health-page .soil-field-selector > div:nth-child(2) > button { width: 100%; justify-content: flex-start; min-height: 44px; }
+  .soil-health-page .soil-health-panels { grid-template-columns: minmax(0, 1fr) !important; gap: 12px !important; }
+  .soil-health-page .soil-health-panels > .card { min-width: 0; padding: 16px !important; }
+  .soil-health-page .soil-health-panels > .card > div:first-child { align-items: flex-start !important; gap: 8px; }
+  .soil-health-page .soil-health-panels > .card > div:first-child h3 { min-width: 0; overflow-wrap: anywhere; }
+  .soil-health-page .soil-health-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px !important; }
+  .soil-health-page .soil-health-metric-grid > div { min-width: 0; padding: 10px 8px !important; overflow-wrap: anywhere; }
+  .soil-health-page .soil-health-metric-grid > div > div:first-child { overflow-wrap: anywhere; }
+  .soil-health-page .recharts-responsive-container { min-width: 0; }
+
+  .variety-intelligence-page .page-header { align-items: stretch !important; }
+  .variety-intelligence-page .variety-compare-cta { width: 100%; min-height: 44px; justify-content: center; }
+  .variety-intelligence-page .tab-bar { display: flex; max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; }
+  .variety-intelligence-page .tab-bar > button { flex: 0 0 auto; min-width: max-content; scroll-snap-align: start; }
+  .variety-intelligence-page .variety-quick-compare { align-items: stretch !important; flex-direction: column; gap: 10px; }
+  .variety-intelligence-page .variety-quick-compare .page-hint { line-height: 1.5; }
+  .variety-intelligence-page .variety-compare-button { width: 100%; min-height: 44px; justify-content: center; white-space: normal; }
+  .variety-intelligence-page .variety-cards-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .variety-intelligence-page .variety-card { min-width: 0; }
+  .variety-intelligence-page .vc-header { gap: 8px; }
+  .variety-intelligence-page .vc-name { min-width: 0; overflow-wrap: anywhere; }
+  .variety-intelligence-page .vc-yield { flex-wrap: wrap; gap: 4px 8px; }
+  .variety-intelligence-page .vc-yield > span:last-child { width: 100%; margin-left: 0 !important; }
+  .variety-intelligence-page .variety-card button { max-width: 100%; white-space: normal; }
+  .variety-intelligence-page .variety-forecast-button { width: 100%; min-height: 44px; justify-content: center; white-space: normal; line-height: 1.35; }
+  .variety-intelligence-page .variety-forecast-row { align-items: stretch !important; flex-direction: column; gap: 10px; }
+  .variety-intelligence-page .variety-forecast-button + * { min-width: 0; }
+  .variety-intelligence-page .dash-panel-header { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .variety-intelligence-page .table-wrap { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .variety-intelligence-page .table-wrap table { min-width: 680px; }
+
+  .yield-analytics-page .yield-variance-panel { padding: 16px !important; }
+  .yield-analytics-page .yield-variance-header { align-items: flex-start !important; flex-direction: column; gap: 8px; }
+  .yield-analytics-page .yield-variance-header > div { min-width: 0; }
+  .yield-analytics-page .yield-variance-header h3 { font-size: 15px !important; line-height: 1.4; }
+  .yield-analytics-page .yield-variance-table-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+  .yield-analytics-page .yield-variance-table-scroll table { min-width: 680px; }
+
+  .farm-reports-page .report-target-panel { padding: 15px !important; }
+  .farm-reports-page .report-target-panel > div:nth-child(2) { grid-template-columns: minmax(0, 1fr) !important; gap: 10px !important; }
+  .farm-reports-page .report-type-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 10px !important; }
+  .farm-reports-page .report-type-card { min-width: 0; padding: 14px !important; gap: 11px !important; }
+  .farm-reports-page .report-type-card > div:last-child { min-width: 0; }
+  .farm-reports-page .report-type-card > div:last-child > div:first-child { align-items: flex-start !important; }
+  .farm-reports-page .report-type-card > div:last-child > div:first-child > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+  .farm-reports-page .report-generate-button { min-height: 52px; padding: 12px !important; font-size: 13px !important; line-height: 1.35; white-space: normal; }
+  .farm-reports-page .report-document { padding: 16px !important; border-radius: 14px !important; }
+  .farm-reports-page .report-document-header { flex-direction: column; align-items: stretch !important; gap: 12px !important; }
+  .farm-reports-page .report-document-header h2 { font-size: 20px !important; overflow-wrap: anywhere; }
+  .farm-reports-page .report-document-header > div:last-child { text-align: left !important; }
+  .farm-reports-page .report-document-header > div:last-child > div { justify-content: flex-start !important; overflow-wrap: anywhere; }
+  .farm-reports-page .report-document-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 9px !important; }
+  .farm-reports-page .report-document-section { padding: 14px !important; }
+  .farm-reports-page .report-document-section > div { grid-template-columns: minmax(0, 1fr) !important; }
+  .farm-reports-page .report-document-recommendations { padding: 15px !important; }
+  .farm-reports-page .report-export-toolbar { flex-direction: column; }
+  .farm-reports-page .report-export-toolbar > button { width: 100%; justify-content: center; min-height: 44px; }
+  .farm-reports-page .report-archive-panel { padding: 15px !important; }
+  .farm-reports-page .report-archive-panel > div:first-child { align-items: flex-start !important; gap: 8px; }
+  .farm-reports-page .report-archive-panel > div:nth-child(2) { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .farm-reports-page .report-archive-panel table { min-width: 680px; }
+}
+
+@media (max-width: 400px) {
+  .yield-forecast-page .forecast-tab-actions { grid-template-columns: minmax(0, 1fr); }
+  .soil-health-page .soil-health-summary-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .soil-health-page .soil-health-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .farm-reports-page .report-document-metrics { grid-template-columns: minmax(0, 1fr) !important; }
+}

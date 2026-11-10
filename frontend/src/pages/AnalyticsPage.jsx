@@ -101,7 +101,7 @@ export default function AnalyticsPage() {
 
   return (
     <AppLayout>
-      <div className="page-container">
+      <div className="page-container yield-analytics-page">
         
         {/* Page Header */}
         <div className="page-header" style={{ marginBottom: 20 }}>
@@ -327,8 +327,8 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Variance Progression Table */}
-        <div className="card" style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-color)', background: 'var(--card-bg)', marginBottom: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+        <div className="card yield-variance-panel" style={{ padding: 24, borderRadius: 16, border: '1px solid var(--border-color)', background: 'var(--card-bg)', marginBottom: 24 }}>
+          <div className="yield-variance-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
             <div>
               <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
                 Year-to-Year Yield Variance & Alignment Table
@@ -338,7 +338,7 @@ export default function AnalyticsPage() {
             <Badge variant="success">98.5% Model Concordance</Badge>
           </div>
 
-          <div style={{ overflowX: 'auto' }}>
+          <div className="yield-variance-table-scroll" style={{ overflowX: 'auto' }}>
             <table className="data-table" style={{ width: '100%' }}>
               <thead>
                 <tr>

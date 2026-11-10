@@ -1222,7 +1222,7 @@ export default function PredictionPage() {
             {result && !showPredictionForm && (
               <div ref={resultRef} className="prediction-results" style={{ marginTop: 10 }}>
                 {/* Result Hero Header */}
-                <div style={{
+                <div className="prediction-result-hero" style={{
                   padding: '28px 32px',
                   borderRadius: 18,
                   background: 'linear-gradient(135deg, #09261a 0%, #0d3b27 50%, #064e3b 100%)',
@@ -1233,13 +1233,13 @@ export default function PredictionPage() {
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 20 }}>
-                    <div>
-                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(52, 211, 153, 0.15)', border: '1px solid rgba(52, 211, 153, 0.3)', padding: '4px 10px', borderRadius: 9999, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#6ee7b7', fontWeight: 700, marginBottom: 12 }}>
+                  <div className="prediction-result-hero-layout" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 20 }}>
+                    <div className="prediction-result-primary">
+                      <div className="prediction-result-model-label" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(52, 211, 153, 0.15)', border: '1px solid rgba(52, 211, 153, 0.3)', padding: '4px 10px', borderRadius: 9999, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#6ee7b7', fontWeight: 700, marginBottom: 12 }}>
                         <Sparkles size={12} />
                         FINAL FORECAST VIA {result.model_used?.toUpperCase() || 'RANDOM FOREST'}
                       </div>
-                      <h2 style={{ fontSize: 40, margin: '0 0 8px', color: '#ffffff', fontWeight: 800, letterSpacing: '-0.02em', display: 'flex', alignItems: 'baseline', gap: 10 }}>
+                      <h2 className="prediction-result-yield" style={{ fontSize: 40, margin: '0 0 8px', color: '#ffffff', fontWeight: 800, letterSpacing: '-0.02em', display: 'flex', alignItems: 'baseline', gap: 10 }}>
                         {result.predicted_yield} <span style={{ fontSize: 20, fontWeight: 500, color: '#a7f3d0' }}>tonnes / hectare</span>
                       </h2>
                       <p style={{ margin: 0, fontSize: 15, color: '#d1fae5' }}>
@@ -1247,16 +1247,16 @@ export default function PredictionPage() {
                       </p>
                     </div>
 
-                    <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'flex-end' }}>
-                      <div style={{ background: 'rgba(255, 255, 255, 0.08)', backdropFilter: 'blur(8px)', padding: '12px 20px', borderRadius: 14, textAlign: 'center', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
+                    <div className="prediction-result-hero-metrics" style={{ display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'flex-end' }}>
+                      <div className="prediction-result-hero-metric" style={{ background: 'rgba(255, 255, 255, 0.08)', backdropFilter: 'blur(8px)', padding: '12px 20px', borderRadius: 14, textAlign: 'center', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
                         <span style={{ fontSize: 11, color: '#a7f3d0', textTransform: 'uppercase', display: 'block', fontWeight: 600 }}>Expected Production</span>
                         <strong style={{ fontSize: 24, color: '#ffffff' }}>{result.expected_production} t</strong>
                       </div>
-                      <div style={{ background: 'rgba(255, 255, 255, 0.08)', backdropFilter: 'blur(8px)', padding: '12px 20px', borderRadius: 14, textAlign: 'center', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
+                      <div className="prediction-result-hero-metric" style={{ background: 'rgba(255, 255, 255, 0.08)', backdropFilter: 'blur(8px)', padding: '12px 20px', borderRadius: 14, textAlign: 'center', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
                         <span style={{ fontSize: 11, color: '#a7f3d0', textTransform: 'uppercase', display: 'block', fontWeight: 600 }}>Model Confidence</span>
                         <strong style={{ fontSize: 24, color: '#34d399' }}>{result.confidence}%</strong>
                       </div>
-                      <button type="button" className="btn-primary" onClick={startNewPrediction} style={{ minHeight: 44, padding: '10px 16px', justifyContent: 'center', background: '#10b981', color: '#052e1b', border: '1px solid rgba(167, 243, 208, 0.5)' }}>
+                      <button type="button" className="btn-primary prediction-result-hero-action" onClick={startNewPrediction} style={{ minHeight: 44, padding: '10px 16px', justifyContent: 'center', background: '#10b981', color: '#052e1b', border: '1px solid rgba(167, 243, 208, 0.5)' }}>
                         <Sparkles size={16} /> New Prediction
                       </button>
                     </div>

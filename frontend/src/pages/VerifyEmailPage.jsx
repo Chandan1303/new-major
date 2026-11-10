@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, CheckCircle2, LoaderCircle, MailCheck, ShieldAlert } from 'lucide-react';
 import AuthLayout from '../layouts/AuthLayout';
 import { request } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 export default function VerifyEmailPage() {
   const { token } = useParams();
-  const navigate = useNavigate();
   const { setUser } = useAuth();
-  const [status, setStatus] = useState('verifying'); // verifying, success, already-verified, error
+  const [status, setStatus] = useState('verifying');
   const [message, setMessage] = useState('');
   const [isRetrying, setIsRetrying] = useState(false);
   const verifyAttempted = useRef(false);
@@ -16,7 +16,7 @@ export default function VerifyEmailPage() {
   const performVerification = async () => {
     if (!token) {
       setStatus('error');
-      setMessage('Invalid verification link. No verification token was provided.');
+      setMessage('This verification link is missing its token. Request a new link and try again.');
       return;
     }
 
@@ -25,29 +25,22 @@ export default function VerifyEmailPage() {
 
     try {
       const result = await request('get', `/auth/verify-email/${token}`);
-
       if (result.data?.alreadyVerified) {
         setStatus('already-verified');
         setMessage(result.message || 'Your email is already verified. You can access your account.');
       } else {
         setStatus('success');
-        setMessage(result.message || 'Email verified successfully! You can now access your account.');
+        setMessage(result.message || 'Your email has been verified. You can now access your account.');
       }
-
-      if (result.data?.user) {
-        setUser(result.data.user);
-      }
+      if (result.data?.user) setUser(result.data.user);
     } catch (error) {
-      const errMsg = error.message || '';
-      if (
-        errMsg.toLowerCase().includes('already been used') ||
-        errMsg.toLowerCase().includes('already verified')
-      ) {
+      const errorMessage = error.message || '';
+      if (errorMessage.toLowerCase().includes('already been used') || errorMessage.toLowerCase().includes('already verified')) {
         setStatus('already-verified');
-        setMessage('Your email is already verified. You can log in to your account.');
+        setMessage('Your email is already verified. You can sign in to your account.');
       } else {
         setStatus('error');
-        setMessage(errMsg || 'Verification failed. Please try again.');
+        setMessage(errorMessage || 'Verification failed. Please try again.');
       }
     } finally {
       setIsRetrying(false);
@@ -65,108 +58,44 @@ export default function VerifyEmailPage() {
     performVerification();
   };
 
+  const isVerified = status === 'success' || status === 'already-verified';
+
   return (
-    <AuthLayout compact>
-      <div className="form-content">
-        {status === 'verifying' && (
-          <>
-            <div className="verification-spinner">
-              <div className="spinner"></div>
+    <AuthLayout variant="modern">
+      <section className="auth-rebuilt-card auth-rebuilt-aux-card" aria-labelledby="verify-email-heading" aria-live="polite">
+        {status === 'verifying' ? (
+          <div className="auth-rebuilt-status">
+            <div className="auth-rebuilt-status-icon is-pending"><LoaderCircle size={30} className="animate-spin" /></div>
+            <div className="auth-rebuilt-eyebrow"><MailCheck size={15} /> Email verification</div>
+            <h2 id="verify-email-heading">Verifying your email</h2>
+            <p className="auth-rebuilt-intro">Please wait while we confirm your email address.</p>
+          </div>
+        ) : isVerified ? (
+          <div className="auth-rebuilt-status">
+            <div className="auth-rebuilt-status-icon is-success"><CheckCircle2 size={30} /></div>
+            <div className="auth-rebuilt-eyebrow"><MailCheck size={15} /> Email verification</div>
+            <h2 id="verify-email-heading">{status === 'already-verified' ? 'Email already verified' : 'Email verified'}</h2>
+            <p className="auth-rebuilt-intro">{message}</p>
+            <div className="auth-rebuilt-aux-actions">
+              <Link to="/login" className="auth-rebuilt-submit"><ArrowRight size={17} /> Sign in</Link>
             </div>
-            <h2>Verifying your email...</h2>
-            <p className="intro">
-              Please wait while we verify your email address.
-            </p>
-          </>
-        )}
-
-        {status === 'success' && (
-          <>
-            <div className="verification-icon success">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" fill="#2d7a3e"/>
-                <path d="M8 12l2 2 4-4" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <h2>Email verified successfully!</h2>
-            <p className="intro" style={{ color: '#2d7a3e', fontWeight: 500 }}>
-              {message}
-            </p>
-            <div style={{ marginTop: '28px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <Link to="/dashboard" className="link-button" style={{ textDecoration: 'none' }}>
-                <button type="button" className="submit" style={{ width: '100%' }}>
-                  Go to Dashboard
-                </button>
-              </Link>
-              <Link to="/login" className="link-button" style={{ textDecoration: 'none' }}>
-                <button type="button" className="btn-secondary" style={{ width: '100%', padding: '12px' }}>
-                  Go to Login
-                </button>
-              </Link>
-            </div>
-          </>
-        )}
-
-        {status === 'already-verified' && (
-          <>
-            <div className="verification-icon success">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" fill="#2d7a3e"/>
-                <path d="M8 12l2 2 4-4" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <h2>Email Already Verified</h2>
-            <p className="intro" style={{ color: '#2d7a3e', fontWeight: 500 }}>
-              {message}
-            </p>
-            <div style={{ marginTop: '28px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <Link to="/dashboard" className="link-button" style={{ textDecoration: 'none' }}>
-                <button type="button" className="submit" style={{ width: '100%' }}>
-                  Go to Dashboard
-                </button>
-              </Link>
-              <Link to="/login" className="link-button" style={{ textDecoration: 'none' }}>
-                <button type="button" className="btn-secondary" style={{ width: '100%', padding: '12px' }}>
-                  Go to Login
-                </button>
-              </Link>
-            </div>
-          </>
-        )}
-
-        {status === 'error' && (
-          <>
-            <div className="verification-icon error">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" fill="#c53030"/>
-                <path d="M8 8l8 8M16 8l-8 8" stroke="#ffffff" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </div>
-            <h2>Verification failed</h2>
-            <p className="intro" style={{ color: '#c53030' }}>
-              {message}
-            </p>
-            <div style={{ marginTop: '32px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <button
-                type="button"
-                className="submit"
-                onClick={handleRetry}
-                disabled={isRetrying}
-              >
-                {isRetrying ? 'Retrying...' : 'Retry Verification'}
+          </div>
+        ) : (
+          <div className="auth-rebuilt-status">
+            <div className="auth-rebuilt-status-icon is-error"><ShieldAlert size={30} /></div>
+            <div className="auth-rebuilt-eyebrow"><MailCheck size={15} /> Email verification</div>
+            <h2 id="verify-email-heading">Verification didn’t complete</h2>
+            <p className="auth-rebuilt-intro">{message}</p>
+            <div className="auth-rebuilt-aux-actions">
+              <button type="button" className="auth-rebuilt-submit" onClick={handleRetry} disabled={isRetrying}>
+                <ArrowRight size={17} /> {isRetrying ? 'Retrying…' : 'Try again'}
               </button>
-              <Link to="/resend-verification" className="link-button" style={{ textDecoration: 'none' }}>
-                <button type="button" className="btn-secondary" style={{ width: '100%', padding: '12px' }}>
-                  Resend Verification Email
-                </button>
-              </Link>
-              <p className="alternate" style={{ margin: '8px 0 0' }}>
-                <Link to="/login">Back to Login</Link>
-              </p>
+              <Link to="/resend-verification" className="auth-rebuilt-secondary-link">Send a new verification link</Link>
             </div>
-          </>
+            <p className="auth-rebuilt-switch auth-rebuilt-back-link"><Link to="/login"><ArrowLeft size={14} /> Back to sign in</Link></p>
+          </div>
         )}
-      </div>
+      </section>
     </AuthLayout>
   );
 }

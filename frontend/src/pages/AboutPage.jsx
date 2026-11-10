@@ -190,20 +190,20 @@ export default function AboutPage() {
         </div>
 
         {/* Team & Institutional Details */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
+        <div className="about-institution-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
           
           {/* Team Members */}
-          <div className="card" style={{ padding: 22, borderRadius: 16, border: '1px solid var(--border-color)', background: 'var(--card-bg)' }}>
+          <div className="card about-info-card" style={{ padding: 22, borderRadius: 16, border: '1px solid var(--border-color)', background: 'var(--card-bg)' }}>
             <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
               <Users size={16} color="var(--primary)" /> Project Team
             </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div className="about-team-list" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {team.map(m => (
-                <div key={m.name} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 10, borderRadius: 10, background: 'var(--bg-secondary)' }}>
-                  <div style={{ width: 34, height: 34, borderRadius: 8, background: `${m.color}22`, color: m.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 12 }}>
+                <div key={m.name} className="about-team-member" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 10, borderRadius: 10, background: 'var(--bg-secondary)' }}>
+                  <div className="about-member-initials" style={{ width: 34, height: 34, borderRadius: 8, background: `${m.color}22`, color: m.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 12 }}>
                     {m.initials}
                   </div>
-                  <div>
+                  <div className="about-member-copy">
                     <strong style={{ fontSize: 13, color: 'var(--text-primary)', display: 'block' }}>{m.name}</strong>
                     <span style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block' }}>{m.usn}</span>
                     <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{m.role}</span>
@@ -214,11 +214,11 @@ export default function AboutPage() {
           </div>
 
           {/* Academic Governance */}
-          <div className="card" style={{ padding: 22, borderRadius: 16, border: '1px solid var(--border-color)', background: 'var(--card-bg)' }}>
+          <div className="card about-info-card" style={{ padding: 22, borderRadius: 16, border: '1px solid var(--border-color)', background: 'var(--card-bg)' }}>
             <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
               <GraduationCap size={16} color="var(--primary)" /> Academic & Faculty Supervision
             </h3>
-            <div style={{ padding: 16, borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', marginBottom: 14 }}>
+            <div className="about-faculty-guide" style={{ padding: 16, borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', marginBottom: 14 }}>
               <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--primary)', display: 'block', marginBottom: 4 }}>
                 PROJECT FACULTY GUIDE
               </span>
@@ -228,8 +228,8 @@ export default function AboutPage() {
               <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)' }}>National Institute of Engineering (NIE), Mysuru</p>
             </div>
 
-            <div style={{ padding: 12, borderRadius: 10, background: 'var(--primary-glow)', border: '1px solid var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div>
+            <div className="about-academic-year" style={{ padding: 12, borderRadius: 10, background: 'var(--primary-glow)', border: '1px solid var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div className="about-academic-copy">
                 <span style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block' }}>DEGREE & ACADEMIC YEAR</span>
                 <strong style={{ fontSize: 13, color: 'var(--primary)' }}>B.E. Information Science & Engineering (2026–2027)</strong>
               </div>

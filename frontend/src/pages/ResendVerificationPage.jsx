@@ -3,82 +3,59 @@ import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { ArrowLeft, ArrowRight, CheckCircle2, Mail, ShieldCheck } from 'lucide-react';
 import AuthLayout from '../layouts/AuthLayout';
 import SubmitButton from '../components/SubmitButton';
 import { request } from '../services/api';
 
-const schema = z.object({
-  email: z.string().email('Enter a valid email address.')
-});
+const schema = z.object({ email: z.string().email('Enter a valid email address.') });
 
 export default function ResendVerificationPage() {
   const [sent, setSent] = useState(false);
-  const { register, handleSubmit, formState: { errors, isSubmitting }, setError } = useForm({
-    resolver: zodResolver(schema)
-  });
+  const { register, handleSubmit, formState: { errors, isSubmitting }, setError } = useForm({ resolver: zodResolver(schema) });
 
-  const onSubmit = async (values) => {
+  const onSubmit = async values => {
     try {
-      const result = await request('post', '/auth/resend-verification', values);
+      await request('post', '/auth/resend-verification', values);
       setSent(true);
-    } catch (e) {
-      setError('root', { message: e.message });
+    } catch (error) {
+      setError('root', { message: error.message || 'Unable to send a verification link. Please try again.' });
     }
   };
 
-  if (sent) {
-    return (
-      <AuthLayout compact>
-        <div className="form-content">
-          <div className="verification-icon success">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="#2d7a3e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-            </svg>
-          </div>
-          <h2>Check your email</h2>
-          <p className="intro">
-            If an unverified account exists for that email address, we've sent a new verification link. 
-            Please check your inbox and spam folder.
-          </p>
-          <p className="intro">
-            The verification link will expire in 24 hours.
-          </p>
-          <p className="alternate">
-            <Link to="/login">Back to Login</Link>
-          </p>
-        </div>
-      </AuthLayout>
-    );
-  }
-
   return (
-    <AuthLayout compact>
-      <div className="form-content">
-        <p className="eyebrow">Email Verification</p>
-        <h2>Resend verification email</h2>
-        <p className="intro">
-          Enter your email address and we'll send you a new verification link.
-        </p>
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div className="field">
-            <label htmlFor="email">Email address</label>
-            <input
-              id="email"
-              type="email"
-              placeholder="your.email@example.com"
-              autoComplete="email"
-              aria-invalid={!!errors.email}
-              {...register('email')}
-            />
-            {errors.email && <p className="field-error" role="alert">{errors.email.message}</p>}
+    <AuthLayout variant="modern">
+      <section className="auth-rebuilt-card auth-rebuilt-aux-card" aria-labelledby="resend-verification-heading">
+        {sent ? (
+          <div className="auth-rebuilt-status">
+            <div className="auth-rebuilt-status-icon is-success"><CheckCircle2 size={30} /></div>
+            <div className="auth-rebuilt-eyebrow"><Mail size={15} /> Email verification</div>
+            <h2 id="resend-verification-heading">Check your email</h2>
+            <p className="auth-rebuilt-intro">If an unverified account exists for that address, a new verification link has been sent. Check your inbox and spam folder.</p>
+            <div className="auth-rebuilt-notice">The verification link expires in 24 hours.</div>
+            <Link className="auth-rebuilt-submit auth-rebuilt-aux-primary" to="/login"><ArrowLeft size={17} /> Back to sign in</Link>
           </div>
-          {errors.root && <p className="form-error" role="alert">{errors.root.message}</p>}
-          <SubmitButton loading={isSubmitting}>Send verification email</SubmitButton>
-        </form>
-        <p className="alternate">
-          Remember your password? <Link to="/login">Sign in</Link>
-        </p>
-      </div>
+        ) : (
+          <>
+            <div className="auth-rebuilt-eyebrow"><ShieldCheck size={15} /> Email verification</div>
+            <h2 id="resend-verification-heading">Resend verification email</h2>
+            <p className="auth-rebuilt-intro">Enter your account email and we’ll send a fresh verification link.</p>
+            <form onSubmit={handleSubmit(onSubmit)} noValidate>
+              <div className="auth-rebuilt-field">
+                <label htmlFor="email">Email address</label>
+                <div className="auth-rebuilt-input-wrap">
+                  <Mail size={17} aria-hidden="true" />
+                  <input id="email" type="email" autoComplete="email" placeholder="name@myfarm.com" aria-invalid={!!errors.email} {...register('email')} />
+                </div>
+                {errors.email && <p className="auth-rebuilt-error" role="alert">{errors.email.message}</p>}
+              </div>
+              {errors.root && <div className="auth-rebuilt-alert" role="alert">{errors.root.message}</div>}
+              <SubmitButton loading={isSubmitting} className="auth-rebuilt-submit" icon={ArrowRight}>Send verification email</SubmitButton>
+            </form>
+            <p className="auth-rebuilt-switch auth-rebuilt-back-link">Remember your password? <Link to="/login">Sign in</Link></p>
+          </>
+        )}
+      </section>
     </AuthLayout>
   );
 }

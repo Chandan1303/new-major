@@ -26,6 +26,7 @@ export default function VarietyGrowingGuidePage() {
   const [stateVarietyCodes, setStateVarietyCodes] = useState(null);
   const [availableStates, setAvailableStates] = useState([]);
   const [search, setSearch] = useState('');
+  const [varietyImageIndex, setVarietyImageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -91,6 +92,15 @@ export default function VarietyGrowingGuidePage() {
   const selectedVariety = filteredVarieties.find(item => (item.variety_code || item.code) === selectedCode) || filteredVarieties[0];
   const selectedProfile = profiles.find(item => (item.code || item.official_identifier) === (selectedVariety?.variety_code || selectedVariety?.code));
   const code = selectedVariety?.variety_code || selectedVariety?.code || '';
+  const imageCodes = [...new Set([code, selectedVariety?.name].filter(Boolean))];
+  const imageBases = imageCodes.flatMap(value => {
+    const clean = String(value).trim();
+    const slug = clean.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    return [clean, slug];
+  });
+  if (/^co\s*86032$/i.test(code)) imageBases.unshift('Co 86032 (Nayana)', 'co-86032-nayana');
+  const varietyImageCandidates = [...new Set(imageBases)].flatMap(base => ['jpg', 'jpeg', 'png', 'webp', 'avif'].map(extension => `/images/varieties/${encodeURIComponent(base)}.${extension}`));
+  useEffect(() => setVarietyImageIndex(0), [code]);
   const maturityAndDuration = [
     selectedProfile?.maturity || selectedVariety?.maturity || selectedVariety?.maturity_type,
     selectedProfile?.duration || selectedVariety?.duration || selectedVariety?.duration_months,
@@ -120,7 +130,14 @@ export default function VarietyGrowingGuidePage() {
     {loading ? <div className="guide-loading">Loading the variety dataset…</div> : error ? <div className="guide-error"><AlertTriangle size={18} />{error}</div> : !varieties.length ? <div className="guide-empty">No variety records are available.</div> : state && regionalVarieties.length === 0 ? <div className="guide-empty">No varieties in the app dataset are listed for {state}. Verify local recommendations before planting.</div> : <div className="guide-layout">
       <aside className="guide-list-panel"><label className="guide-search"><Search size={15} /><input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search varieties" /></label><div className="guide-variety-list">{filteredVarieties.map(item => { const itemCode = item.variety_code || item.code; const active = itemCode === code; const profile = profiles.find(value => (value.code || value.official_identifier) === itemCode); const maturity = profile?.maturity || item.maturity || item.maturity_type; const duration = profile?.duration_short || item.duration || item.duration_months; const maturityLabel = [maturity, duration].filter(hasGuideValue).join(' · '); return <button key={itemCode} className={`guide-variety-option ${active ? 'active' : ''}`} onClick={() => setSelectedCode(itemCode)}><span className="guide-variety-mark"><Sprout size={17} /></span><span><strong>{itemCode}</strong>{maturityLabel && <small>{maturityLabel}</small>}</span>{active && <CheckCircle2 size={17} />}</button>; })}</div></aside>
 
-      {selectedVariety && <main className="guide-detail-panel"><div className="guide-detail-head"><div><span className="guide-eyebrow">Variety profile</span><h2>{selectedVariety.name || code}</h2><p>{selectedProfile?.regions || selectedVariety.description || `Agronomy details recorded for ${code}.`}</p></div><div className={`guide-region-status ${textList(selectedVariety.states || selectedVariety.recommended_states).some(value => value.toLowerCase() === state.toLowerCase()) ? 'listed' : ''}`}>{textList(selectedVariety.states || selectedVariety.recommended_states).some(value => value.toLowerCase() === state.toLowerCase()) ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />}{regionStatus(selectedVariety, state)}</div></div>
+      {selectedVariety && <main className="guide-detail-panel">
+        <div className="guide-detail-head guide-detail-head-with-image">
+          <div className="guide-variety-media">
+            {varietyImageIndex < varietyImageCandidates.length ? <img className="guide-variety-photo" src={varietyImageCandidates[varietyImageIndex]} alt={`${selectedVariety.name || code} sugarcane variety`} onError={() => setVarietyImageIndex(index => index + 1)} /> : <div className="guide-variety-image-placeholder"><Sprout size={22} /><span>Variety image</span></div>}
+          </div>
+          <div className="guide-variety-heading"><span className="guide-eyebrow">Variety profile</span><h2>{selectedVariety.name || code}</h2><p>{selectedProfile?.regions || selectedVariety.description || `Agronomy details recorded for ${code}.`}</p></div>
+          <div className={`guide-region-status ${textList(selectedVariety.states || selectedVariety.recommended_states).some(value => value.toLowerCase() === state.toLowerCase()) ? 'listed' : ''}`}>{textList(selectedVariety.states || selectedVariety.recommended_states).some(value => value.toLowerCase() === state.toLowerCase()) ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />}{regionStatus(selectedVariety, state)}</div>
+        </div>
 
         <div className="guide-summary-grid">{hasGuideValue(origin) && <article><small>Origin</small><strong>{origin}</strong></article>}{hasGuideValue(yieldRange) && <article><small>Reported yield</small><strong>{yieldRange}</strong><span>Regional or season-specific reference; not a guarantee.</span></article>}{hasGuideValue(sucrose) && <article><small>Sucrose / recovery</small><strong>{sucrose}</strong><span>Variety sucrose content and factory recovery are different measures.</span></article>}</div>
 

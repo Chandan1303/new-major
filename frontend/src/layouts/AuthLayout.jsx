@@ -10,11 +10,14 @@ import {
   Radio,
   Cpu
 } from 'lucide-react';
+import { Moon, Sun } from 'lucide-react';
 import AuthThemeSwitcher from '../components/AuthThemeSwitcher';
 import Brand from '../components/Brand';
 import brandLogo from '../assets/logo.png';
+import { useTheme } from '../context/ThemeContext';
 
 export default function AuthLayout({ children, compact = false, variant = 'legacy' }) {
+  const { isDark, toggleTheme } = useTheme();
   const [theme, setTheme] = useState(() => {
     try {
       return localStorage.getItem('sugaryield_auth_theme') || 'emerald';
@@ -63,6 +66,16 @@ export default function AuthLayout({ children, compact = false, variant = 'legac
           <footer className="auth-rebuilt-hero-footer"><span><Sprout size={14} /> SugarYield AI <i /> Sugarcane decision support</span><span><ShieldCheck size={13} /> Farmer-centred design</span></footer>
         </aside>
         <section className="auth-rebuilt-main">
+          <button
+            className="auth-mode-toggle"
+            type="button"
+            onClick={toggleTheme}
+            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {isDark ? <Sun size={17} /> : <Moon size={17} />}
+            <span>{isDark ? 'Light mode' : 'Dark mode'}</span>
+          </button>
           <div className="auth-rebuilt-mobile-brand"><Brand /><span>Sugarcane field management</span></div>
           <div className="auth-rebuilt-card-wrap">{children}</div>
         </section>

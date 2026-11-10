@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Sparkles,
   TrendingUp,
@@ -477,29 +477,20 @@ export default function HomePage() {
         </section>
 
         {/* Footer Section */}
-        <footer className="home-footer" style={{
-          marginTop: 60,
-          padding: '40px 24px',
-          borderTop: '1px solid var(--border)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: 16,
-          color: 'var(--text-muted)',
-          fontSize: 13
-        }}>
-          <div>
-            <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: 4 }}>
+        <footer className="home-footer">
+          <div className="home-footer-brand">
+            <strong>
               SugarYield AI Platform
             </strong>
-            <span>AI-Based Sugarcane Yield Forecasting & Agricultural Decision Support System</span>
+            <span className="home-footer-description">
+              AI-Based Sugarcane Yield Forecasting &amp; Agricultural Decision Support System
+            </span>
           </div>
-          <div style={{ display: 'flex', gap: 18 }}>
-            <span onClick={() => navigate('/about')} style={{ cursor: 'pointer', color: 'var(--primary)' }}>About System</span>
-            <span onClick={() => navigate('/terms-of-use')} style={{ cursor: 'pointer' }}>Terms of Use</span>
-            <span onClick={() => navigate('/privacy-policy')} style={{ cursor: 'pointer' }}>Privacy Policy</span>
-          </div>
+          <nav className="home-footer-links" aria-label="Footer">
+            <Link to="/about">About System</Link>
+            <Link to="/terms-of-use">Terms of Use</Link>
+            <Link to="/privacy-policy">Privacy Policy</Link>
+          </nav>
         </footer>
       </div>
     </AppLayout>

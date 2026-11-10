@@ -1,16 +1,11 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import AuthLayout from '../layouts/AuthLayout';
+import LegalPageLayout from '../components/LegalPageLayout';
 
 export default function PrivacyPolicyPage() {
   return (
-    <AuthLayout compact>
-      <div className="legal-content">
-        <Link to="/login" className="back-link">← Back to Login</Link>
-        
-        <h2>Privacy Policy</h2>
-        
-        <div className="legal-text">
+    <LegalPageLayout
+      title="Privacy Policy"
+      description="How SugarYield AI describes the information collected and used to provide its services."
+    >
           <section>
             <h3>1. Information We Collect</h3>
             <p>
@@ -121,8 +116,6 @@ export default function PrivacyPolicyPage() {
           <p className="legal-footer">
             Last updated: January 2024
           </p>
-        </div>
-      </div>
-    </AuthLayout>
+    </LegalPageLayout>
   );
 }

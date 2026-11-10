@@ -1,152 +1,71 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import AppLayout from '../components/AppLayout';
-import axios from 'axios';
+import { NDVI_DATA, NDVI_PERIOD, NDVI_CLASSIFICATIONS, classifyMeanNdvi, formatMeanNdvi, getDistrictNdvi } from '../data/ndviDistrictData';
 
-const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/+$/, '');
-const buildApiUrl = (path) => {
-  const base = API_BASE_URL.endsWith('/api') ? API_BASE_URL : `${API_BASE_URL}/api`;
-  return `${base}${path}`;
+const stateMapImages = {
+  'Andhra Pradesh': '/images/ndvi-maps/Andhra-Pradesh.png',
+  Bihar: '/images/ndvi-maps/Bihar.png',
+  Gujarat: '/images/ndvi-maps/Gujarat.png',
+  Haryana: '/images/ndvi-maps/Haryana.png',
+  Karnataka: '/images/ndvi-maps/Karnataka.png',
+  Maharashtra: '/images/ndvi-maps/Maharashtra.png',
+  Punjab: '/images/ndvi-maps/Punjab.png',
+  'Tamil Nadu': '/images/ndvi-maps/Tamil-Nadu.png',
+  Telangana: '/images/ndvi-maps/Telangana.png',
+  Uttarakhand: '/images/ndvi-maps/Uttarakhand.png',
+  'Uttar Pradesh': '/images/ndvi-maps/Uttar-Pradesh.png',
 };
 
-// States and districts - ALL NOW HAVE NDVI DATA ✅
-const INDIA_GEOGRAPHY = [
-  {
-    state: "Karnataka",
-    districts: ["Belagavi", "Mandya", "Mysuru", "Bagalkot", "Shivamogga", "Vijayapura", "Chikkamagaluru", "Davangere", "Raichur", "Bellary", "Chitradurga", "Uttara Kannada"]
-  },
-  {
-    state: "Punjab",
-    districts: ["Jalandhar", "Gurdaspur", "Amritsar"]
-  },
-  {
-    state: "Tamil Nadu",
-    districts: ["Coimbatore", "Erode", "Salem", "Thanjavur", "Tiruchirappalli", "Cuddalore", "Tirunelveli", "Thoothukudi", "Villupuram", "Namakkal", "Karur", "Perambalur"]
-  },
-  {
-    state: "Uttar Pradesh",
-    districts: ["Muzaffarnagar", "Meerut", "Bijnor", "Saharanpur", "Bareilly", "Lakhimpur Kheri", "Deoria", "Basti", "Gonda", "Gorakhpur", "Pilibhit", "Shahjahanpur", "Bulandshahr"]
-  },
-  {
-    state: "Maharashtra",
-    districts: ["Kolhapur", "Sangli", "Satara", "Ahmednagar", "Pune", "Solapur", "Nashik", "Jalgaon", "Dhule", "Nandurbar", "Beed", "Osmanabad"]
-  },
-  {
-    state: "Andhra Pradesh",
-    districts: ["East Godavari", "West Godavari", "Krishna", "Visakhapatnam", "Guntur", "Prakasam", "Chittoor", "Nellore"]
-  },
-  {
-    state: "Gujarat",
-    districts: ["Surat", "Navsari", "Bharuch", "Valsad", "Tapi", "Narmada", "Ahmedabad", "Kheda"]
-  },
-  {
-    state: "Haryana",
-    districts: ["Yamuna Nagar", "Karnal", "Kurukshetra"]
-  },
-  {
-    state: "Bihar",
-    districts: ["Champaran", "Siwan", "Gopalganj", "Muzaffarpur", "Saran", "Darbhanga", "Vaishali"]
-  },
-  {
-    state: "Telangana",
-    districts: ["Nizamabad", "Medak", "Karimnagar", "Khammam", "Warangal", "Nalgonda", "Sangareddy"]
-  },
-  {
-    state: "Uttarakhand",
-    districts: ["Haridwar", "Dehradun"]
-  }
-];
-
-function healthColor(h) {
-  if (h === 'Healthy' || h === 'Excellent') return '#16a34a';
-  if (h === 'Good')    return '#65a30d';
-  if (h === 'Moderate' || h === 'Fair') return '#ca8a04';
-  if (h === 'Poor') return '#f97316';
-  return '#dc2626';
-}
+const NDVI_GEOGRAPHY = Object.entries(NDVI_DATA).map(([state, records]) => ({
+  state,
+  districts: records.map(record => record.district),
+}));
 
 export default function CropHealthPage() {
-  const [ndviData, setNdviData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [selectedState, setSelectedState] = useState('Karnataka');
-  const [selectedDistrict, setSelectedDistrict] = useState('Belagavi');
-  const [healthThresholds, setHealthThresholds] = useState([]);
-  
-  
-  // Get districts for selected state
-  const availableDistricts = INDIA_GEOGRAPHY.find(s => s.state === selectedState)?.districts || [];
-  
-  // Update district when state changes
-  useEffect(() => {
-    if (availableDistricts.length > 0 && !availableDistricts.includes(selectedDistrict)) {
-      setSelectedDistrict(availableDistricts[0]);
-    }
-  }, [selectedState]);
-
-  // Fetch health thresholds on mount
-  useEffect(() => {
-    fetchHealthThresholds();
-  }, []);
-
-  // Fetch NDVI data when state/district changes
-  useEffect(() => {
-    if (selectedState && selectedDistrict) {
-      // Add small delay to prevent multiple rapid calls
-      const timer = setTimeout(() => {
-        fetchNDVIData();
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [selectedState, selectedDistrict]);
-
-  const fetchHealthThresholds = async () => {
-    try {
-      const response = await axios.get(buildApiUrl('/ndvi/health-thresholds'));
-      if (response.data.success) {
-        setHealthThresholds(response.data.data.thresholds || []);
-      } else {
-        setHealthThresholds([]);
-      }
-    } catch (err) {
-      console.error('Failed to fetch health thresholds:', err);
-    }
-  };
-
-  const fetchNDVIData = async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const response = await axios.get(buildApiUrl('/ndvi/current'), {
-        params: {
-          state: selectedState,
-          district: selectedDistrict,
-          days_back: 30
-        }
-      });
-
-      if (response.data.success) {
-        setNdviData(response.data.data);
-      } else {
-        setError(response.data.error || 'Failed to fetch NDVI data');
-      }
-    } catch (err) {
-      setError(err.response?.data?.error || 'Failed to fetch NDVI data');
-      console.error('NDVI fetch error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Convert NDVI (0-1) to Vigor percentage (0-100)
-  const ndviToVigor = (ndvi) => Math.round(ndvi * 100);
-
-  // Get current NDVI health if available
-  const currentNDVIHealth = ndviData?.ndvi_data?.average_health || null;
-  const currentNDVIValue = currentNDVIHealth?.ndvi_value ?? null;
-  const currentVigor = currentNDVIValue == null ? null : ndviToVigor(Number(currentNDVIValue));
-  const currentHealthStatus = currentNDVIHealth?.category || 'Unavailable';
-  const currentHealthColor = currentNDVIHealth?.color || '#64748b';
+  const [selectedLocation, setSelectedLocation] = useState({ state: 'Karnataka', district: 'Belagavi' });
+  const { state: selectedState, district: selectedDistrict } = selectedLocation;
+  const selectedRegion = NDVI_GEOGRAPHY.find(region => region.state === selectedState);
+  const availableDistricts = selectedRegion?.districts || [];
+  const selectedRecord = getDistrictNdvi(selectedState, selectedDistrict);
+  const currentNDVIValue = selectedRecord?.ndvi ?? null;
+  const classification = classifyMeanNdvi(currentNDVIValue);
+  const currentNDVIHealth = classification ? {
+    ...classification,
+    description: classification.interpretation,
+    ndvi_value: currentNDVIValue,
+    ndvi_range: [classification.min, classification.max],
+    icon: '●',
+    action_required: currentNDVIValue < 0.3,
+    priority: currentNDVIValue < 0.2 ? 'High' : 'Medium',
+    recommendations: currentNDVIValue < 0.3
+      ? ['Review vegetation coverage and inspect crop conditions for this district.']
+      : ['Continue routine crop monitoring for this district.'],
+  } : null;
+  const currentHealthStatus = classification?.category || 'Unavailable';
+  const currentHealthColor = classification?.color || '#64748b';
+  const currentVigor = currentNDVIValue == null ? null : Math.round(currentNDVIValue * 100);
+  const observationStartDate = NDVI_PERIOD.start_date;
+  const observationEndDate = NDVI_PERIOD.end_date;
+  const healthThresholds = NDVI_CLASSIFICATIONS.map(item => ({
+    ...item,
+    ndvi_range: { min: item.min, max: item.max },
+    description: item.interpretation,
+    icon: '●',
+    action_required: false,
+  }));
+  const currentNDVIData = selectedRecord ? {
+    data_source: 'provided-period-mean',
+    timestamp: `${NDVI_PERIOD.end_date}T00:00:00`,
+    location: { state: selectedState, district: selectedDistrict },
+    ndvi_data: {
+      source: 'User-provided hardcoded district mean',
+      ndvi_mean: selectedRecord.ndvi,
+      observation_date: NDVI_PERIOD.end_date,
+      start_date: NDVI_PERIOD.start_date,
+      end_date: NDVI_PERIOD.end_date,
+      average_health: currentNDVIHealth,
+    },
+  } : null;
 
   return (
     <AppLayout>
@@ -156,10 +75,10 @@ export default function CropHealthPage() {
             <p className="eyebrow">Regional NDVI Monitoring</p>
             <h1 className="page-title">Crop Health & Vegetation Analysis</h1>
             <p className="page-subtitle">
-              District-level historical vegetation averages. Live Sentinel-2 readings are unavailable because Google Earth Engine is not configured.
+              District mean NDVI values supplied for January 1 through July 31, 2026.
             </p>
           </div>
-          <span className="badge badge-green">{ndviData?.data_source === 'realtime' ? '🛰️ Live Sentinel-2' : '📊 Historical regional data'}</span>
+          <span className="badge badge-green">2026 district mean NDVI</span>
         </div>
 
         {/* Location Selector */}
@@ -167,15 +86,20 @@ export default function CropHealthPage() {
           <div className="dash-panel-header">
             <h3>📍 Select Location for NDVI Monitoring</h3>
           </div>
-          <div style={{ display: 'flex', gap: 16, padding: '16px 24px', alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, padding: '16px 24px', alignItems: 'end' }}>
             <div style={{ flex: 1 }}>
               <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 500 }}>State</label>
               <select 
                 value={selectedState} 
-                onChange={(e) => setSelectedState(e.target.value)}
+                onChange={(e) => {
+                  const nextState = NDVI_GEOGRAPHY.find(region => region.state === e.target.value);
+                  if (nextState) {
+                    setSelectedLocation({ state: nextState.state, district: nextState.districts[0] });
+                  }
+                }}
                 style={{ width: '100%', padding: '10px', borderRadius: 8, border: '1px solid #ddd' }}
               >
-                {INDIA_GEOGRAPHY.map(item => (
+                {NDVI_GEOGRAPHY.map(item => (
                   <option key={item.state} value={item.state}>{item.state}</option>
                 ))}
               </select>
@@ -184,7 +108,7 @@ export default function CropHealthPage() {
               <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 500 }}>District</label>
               <select 
                 value={selectedDistrict} 
-                onChange={(e) => setSelectedDistrict(e.target.value)}
+                onChange={(e) => setSelectedLocation(location => ({ ...location, district: e.target.value }))}
                 style={{ width: '100%', padding: '10px', borderRadius: 8, border: '1px solid #ddd' }}
               >
                 {availableDistricts.map(district => (
@@ -192,35 +116,7 @@ export default function CropHealthPage() {
                 ))}
               </select>
             </div>
-            <button 
-              onClick={fetchNDVIData}
-              disabled={loading}
-              style={{ 
-                padding: '10px 24px', 
-                background: '#16a34a', 
-                color: 'white', 
-                border: 'none', 
-                borderRadius: 8,
-                cursor: loading ? 'not-allowed' : 'pointer',
-                marginTop: 22
-              }}
-            >
-              {loading ? '⏳ Loading...' : '🔄 Refresh NDVI'}
-            </button>
           </div>
-          
-          {error && (
-            <div className="ndvi-error-callout" style={{ 
-              margin: '0 24px 16px', 
-              padding: 12, 
-              background: '#fef2f2', 
-              border: '1px solid #fca5a5', 
-              borderRadius: 8,
-              color: '#dc2626'
-            }}>
-              ⚠️ {error}
-            </div>
-          )}
         </div>
 
         {/* NDVI Overview - Enhanced with Real Data */}
@@ -228,11 +124,11 @@ export default function CropHealthPage() {
           <div className="summary-card" style={{ '--card-accent': currentHealthColor }}>
             <div className="sc-icon">🛰️</div>
             <div className="sc-body">
-              <span className="sc-label">NDVI Value</span>
-              <span className="sc-value">{currentNDVIValue ? currentNDVIValue.toFixed(3) : '—'}</span>
-              {ndviData?.data_source && (
+              <span className="sc-label">Mean NDVI value</span>
+              <span className="sc-value">{formatMeanNdvi(currentNDVIValue)}</span>
+              {currentNDVIData?.data_source && (
                 <span style={{ fontSize: 11, color: '#666', marginTop: 4 }}>
-                  {ndviData.data_source === 'realtime' ? '📡 Real-time' : '📊 Historical'}
+                  User-provided mean
                 </span>
               )}
             </div>
@@ -256,20 +152,12 @@ export default function CropHealthPage() {
             </div>
           </div>
 
-          <div className="summary-card" style={{ '--card-accent': '#2d7a3e' }}>
-            <div className="sc-icon">📈</div>
-            <div className="sc-body">
-              <span className="sc-label">Growth Stage</span>
-              <span className="sc-value">Not provided</span>
-            </div>
-          </div>
-
           <div className="summary-card" style={{ '--card-accent': '#3b82f6' }}>
             <div className="sc-icon">📅</div>
             <div className="sc-body">
-              <span className="sc-label">Last Observation</span>
+              <span className="sc-label">Observation Period</span>
               <span className="sc-value" style={{ fontSize: 14 }}>
-                {ndviData?.ndvi_data?.observation_date || (ndviData ? 'Date not provided' : 'No reading loaded')}
+                {observationStartDate} – {observationEndDate}
               </span>
             </div>
           </div>
@@ -285,14 +173,19 @@ export default function CropHealthPage() {
               </span>
             </div>
             <div style={{ padding: '16px 24px' }}>
-              <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+              <div className="ndvi-current-analysis">
                 <div style={{ flex: 2 }}>
                   <p style={{ fontSize: 16, marginBottom: 12, fontWeight: 500 }}>
                     {currentNDVIHealth.description}
                   </p>
                   <div style={{ marginBottom: 16 }}>
-                    <strong>NDVI Range:</strong>{' '}
-                    {currentNDVIHealth.ndvi_range?.[0]?.toFixed(2)} - {currentNDVIHealth.ndvi_range?.[1]?.toFixed(2)}
+                    <strong>Mean NDVI value:</strong> {formatMeanNdvi(currentNDVIValue)}
+                  </div>
+                  <div style={{ marginBottom: 16 }}>
+                    <strong>Classification:</strong> {currentHealthStatus}
+                  </div>
+                  <div style={{ marginBottom: 16 }}>
+                    <strong>Interpretation:</strong> {currentNDVIHealth.interpretation || currentNDVIHealth.description}
                   </div>
                   
                   {currentNDVIHealth.action_required && (
@@ -346,7 +239,7 @@ export default function CropHealthPage() {
                     </div>
                   </div>
                   <div className="ndvi-gauge-caption" style={{ fontSize: 13, color: '#666' }}>
-                    NDVI: {currentNDVIValue?.toFixed(3)}
+                    Mean NDVI: {formatMeanNdvi(currentNDVIValue)}
                   </div>
                 </div>
               </div>
@@ -355,14 +248,24 @@ export default function CropHealthPage() {
         )}
 
         <div className="dash-two-col">
-          {/* The API provides regional averages only, not parcel or sensor readings. */}
+          {/* State-level NDVI image provided with the 2026 district period data. */}
           <div className="dash-panel">
             <div className="dash-panel-header">
-              <h3>Field-level NDVI</h3>
+              <h3>{selectedState} NDVI Map</h3>
+              <span className="badge badge-green">District period averages</span>
             </div>
-            <div style={{ padding: '18px 24px', color: '#64748b', lineHeight: 1.6 }}>
-              {selectedDistrict}, {selectedState}: {currentNDVIValue == null ? 'no reading loaded' : `regional mean NDVI ${Number(currentNDVIValue).toFixed(3)}`}.
-              {' '}The current data source does not include per-field zones or ground-sensor readings. Changing the district updates this regional average; it does not provide live satellite refreshes.
+            <div className="ndvi-state-map-wrap">
+              {stateMapImages[selectedState] ? (
+                <img
+                  className="ndvi-state-map"
+                  src={stateMapImages[selectedState]}
+                  alt={`${selectedState} NDVI map`}
+                />
+              ) : <p>NDVI map image is not available for {selectedState}.</p>}
+              <div className="ndvi-state-map-caption">
+                <span><strong>Selected district:</strong> {selectedDistrict || '—'} · Mean NDVI {formatMeanNdvi(currentNDVIValue)}</span>
+                <span><strong>Period:</strong> {observationStartDate} to {observationEndDate}</span>
+              </div>
             </div>
           </div>
 
@@ -373,48 +276,17 @@ export default function CropHealthPage() {
             </div>
             <div style={{ padding: '16px 24px' }}>
               {healthThresholds.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {healthThresholds.map(threshold => (
-                    <div className={`ndvi-threshold-row${threshold.category === currentHealthStatus ? ' active' : ''}`}
-                      key={threshold.category}
-                      style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: 12,
-                        padding: 12,
-                        border: '1px solid #e5e7eb',
-                        borderRadius: 8,
-                        background: threshold.category === currentHealthStatus ? `${threshold.color}11` : 'transparent'
-                      }}
-                    >
-                      <div style={{ 
-                        width: 40, 
-                        height: 40, 
-                        borderRadius: '50%', 
-                        background: threshold.color,
-                        color: 'white',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 20
-                      }}>
-                        {threshold.icon}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                          {threshold.category}
-                        </div>
-                        <div className="ndvi-threshold-range" style={{ fontSize: 13, color: '#666' }}>
-                          NDVI: {threshold.ndvi_range.min.toFixed(2)} - {threshold.ndvi_range.max.toFixed(2)}
-                        </div>
-                      </div>
-                      {threshold.action_required && (
-                        <span className="badge badge-orange" style={{ fontSize: 11 }}>
-                          Action Required
-                        </span>
-                      )}
-                    </div>
-                  ))}
+                <div className="ndvi-classification-table-wrap">
+                  <table className="ndvi-classification-table">
+                    <thead><tr><th>Mean NDVI value</th><th>Classification</th><th>Interpretation</th></tr></thead>
+                    <tbody>{healthThresholds.map(threshold => (
+                      <tr key={threshold.category} className={threshold.category === currentHealthStatus ? 'active' : ''}>
+                        <td>{threshold.range_label || `${threshold.ndvi_range.min.toFixed(2)}–${threshold.ndvi_range.max.toFixed(2)}`}</td>
+                        <td><span className="ndvi-classification-name"><i style={{ backgroundColor: threshold.color }} />{threshold.category}</span></td>
+                        <td>{threshold.interpretation || threshold.description}</td>
+                      </tr>
+                    ))}</tbody>
+                  </table>
                 </div>
               ) : (
                 <p style={{ color: '#666', textAlign: 'center', padding: 24 }}>
@@ -426,7 +298,7 @@ export default function CropHealthPage() {
         </div>
 
         {/* Data Source Info */}
-        {ndviData && (
+        {currentNDVIData && (
           <div className="dash-panel">
             <div className="dash-panel-header">
               <h3>ℹ️ Data Source Information</h3>
@@ -436,26 +308,24 @@ export default function CropHealthPage() {
                 <div>
                   <div className="ndvi-meta-label" style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>Source</div>
                   <div style={{ fontWeight: 500 }}>
-                    {ndviData.data_source === 'realtime' ? '🛰️ Sentinel-2 Satellite' : '📊 Historical Database'}
+                    {currentNDVIData.ndvi_data?.source || 'User-provided 2026 NDVI averages'}
                   </div>
                 </div>
                 <div>
                   <div className="ndvi-meta-label" style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>Location</div>
                   <div style={{ fontWeight: 500 }}>
-                    {ndviData.location.district}, {ndviData.location.state}
+                    {currentNDVIData.location.district}, {currentNDVIData.location.state}
                   </div>
                 </div>
                 <div>
                   <div className="ndvi-meta-label" style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>Resolution</div>
                   <div style={{ fontWeight: 500 }}>
-                    {ndviData.ndvi_data?.resolution_meters ? `${ndviData.ndvi_data.resolution_meters}m` : 'Regional Average'}
+                    {currentNDVIData.ndvi_data?.resolution_meters ? `${currentNDVIData.ndvi_data.resolution_meters}m` : 'Regional Average'}
                   </div>
                 </div>
                 <div>
-                  <div className="ndvi-meta-label" style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>Retrieved</div>
-                  <div style={{ fontWeight: 500 }}>
-                    {new Date(ndviData.timestamp).toLocaleString()}
-                  </div>
+                  <div className="ndvi-meta-label" style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>Observation Period</div>
+                  <div style={{ fontWeight: 500 }}>{observationStartDate} to {observationEndDate}</div>
                 </div>
               </div>
             </div>
@@ -464,6 +334,43 @@ export default function CropHealthPage() {
       </div>
 
       <style>{`
+        .ndvi-current-analysis { display: flex; align-items: flex-start; gap: 24px; }
+        .ndvi-current-analysis > div { min-width: 0; max-width: 100%; }
+        .ndvi-state-map-wrap { padding: 18px 24px 22px; }
+        .ndvi-state-map {
+          display: block;
+          width: 100%;
+          max-height: 520px;
+          object-fit: contain;
+          border: 1px solid var(--border, #d8e5dc);
+          border-radius: 10px;
+          background: #f5faf6;
+        }
+        .ndvi-state-map-caption {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          gap: 8px 20px;
+          margin-top: 14px;
+          color: var(--text-secondary, #365c43);
+          font-size: 13px;
+          line-height: 1.6;
+        }
+        .ndvi-state-map-caption strong { color: var(--text-primary, #173b2a); }
+        .ndvi-classification-table-wrap { overflow-x: auto; padding: 0 16px 16px; }
+        .ndvi-classification-table { width: 100%; min-width: 540px; border-collapse: collapse; color: var(--text-primary); }
+        .ndvi-classification-table th,
+        .ndvi-classification-table td { padding: 11px 12px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: middle; }
+        .ndvi-classification-table th { color: var(--text-secondary); font-size: 12px; font-weight: 700; }
+        .ndvi-classification-table td { font-size: 13px; }
+        .ndvi-classification-table tr.active { background: var(--bg-secondary); font-weight: 600; }
+        .ndvi-classification-name { display: inline-flex; align-items: center; gap: 8px; }
+        .ndvi-classification-name i { width: 9px; height: 9px; flex: 0 0 9px; border-radius: 50%; }
+        @media (max-width: 640px) {
+          .ndvi-current-analysis { flex-direction: column; }
+          .ndvi-state-map-wrap { padding: 14px; }
+          .ndvi-state-map-caption { display: grid; }
+        }
         .ndvi-map-visual {
           padding: 24px;
         }

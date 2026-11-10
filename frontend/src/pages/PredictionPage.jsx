@@ -45,6 +45,7 @@ import SimulatorPage from './SimulatorPage';
 import { useAuth } from '../context/AuthContext';
 import { useField } from '../context/FieldContext';
 import { mlApi, predictionApi, farmApi, weatherApi, irrigationApi, soilApi, varietyApi, geographyApi, request } from '../services/api';
+import { classifyMeanNdvi, formatMeanNdvi, getDistrictNdvi, NDVI_PERIOD } from '../data/ndviDistrictData';
 import toast, { Toaster } from 'react-hot-toast';
 // Static constants
 const SOIL_TYPES = ['Black Soil', 'Alluvial Soil', 'Red Loam', 'Clay Loam', 'Sandy Loam'];
@@ -202,13 +203,36 @@ export default function PredictionPage() {
           const [current, forecast] = await Promise.all([weatherApi.current(location), weatherApi.forecast(location)]);
           data = { current: current.data, forecast: forecast.data?.forecast || [], location };
         } else if (module === 'health') {
-          const query = new URLSearchParams({ state: formData.state, district: formData.district });
-          if (selectedField?.latitude != null && selectedField?.longitude != null) {
-            query.set('latitude', selectedField.latitude);
-            query.set('longitude', selectedField.longitude);
-          }
-          const response = await request('get', `/ndvi/current?${query.toString()}`);
-          data = response.data;
+          const districtMean = getDistrictNdvi(formData.state, formData.district);
+          const classification = districtMean ? classifyMeanNdvi(districtMean.ndvi) : null;
+          const health = classification ? {
+            ...classification,
+            ndvi_value: districtMean.ndvi,
+            interpretation: classification.interpretation,
+            description: classification.interpretation,
+            recommendations: districtMean.ndvi < 0.3
+              ? ['Review vegetation coverage and inspect crop conditions for this district.']
+              : ['Continue routine crop monitoring for this district.'],
+          } : null;
+          data = {
+            data_source: 'User-provided district mean NDVI',
+            timestamp: `${NDVI_PERIOD.end_date}T00:00:00`,
+            location: { state: formData.state, district: formData.district },
+            note: districtMean
+              ? `Mean NDVI for ${formData.district}, ${formData.state}, during ${NDVI_PERIOD.start_date} to ${NDVI_PERIOD.end_date}.`
+              : `No supplied mean NDVI value is available for ${formData.district}, ${formData.state}.`,
+            ndvi_data: districtMean ? {
+              ndvi: districtMean.ndvi,
+              ndvi_value: districtMean.ndvi,
+              ndvi_mean: districtMean.ndvi,
+              source: 'User-provided mean NDVI',
+              health,
+              average_health: health,
+              observation_date: NDVI_PERIOD.end_date,
+              start_date: NDVI_PERIOD.start_date,
+              end_date: NDVI_PERIOD.end_date,
+            } : null,
+          };
         } else if (module === 'varieties') {
           const currentVariety = result?.input_data?.variety || result?.variety || formData.variety;
           const comparisonNames = [...new Set([currentVariety, ...varieties].filter(Boolean))].slice(0, 5);
@@ -1798,7 +1822,7 @@ export default function PredictionPage() {
                             {ndviSnapshot ? (
                               <>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
-                                  <Badge variant="info">{ndviSnapshot.source === 'Historical Data' ? 'Historical regional NDVI' : 'NDVI'} {ndviValue == null ? 'not reported' : Number(ndviValue).toFixed(3)}</Badge>
+                                  <Badge variant="info">Mean NDVI {formatMeanNdvi(ndviValue)}</Badge>
                                   <Badge variant={/poor|fair|moderate/i.test(healthLabel) ? 'warning' : 'success'}>{healthLabel}</Badge>
                                   {ndviSnapshot.total_records != null && <Badge variant="neutral">{ndviSnapshot.total_records} historical records</Badge>}
                                 </div>

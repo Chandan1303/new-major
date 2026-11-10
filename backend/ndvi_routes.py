@@ -33,6 +33,19 @@ ndvi_bp = Blueprint('ndvi', __name__, url_prefix='/api/ndvi')
 ndvi_service = create_ndvi_service(use_gee=False)
 
 
+@ndvi_bp.route('/regions', methods=['GET'])
+def get_ndvi_regions():
+    """List states and districts present in the active NDVI snapshot."""
+    try:
+        data = ndvi_service.get_available_regions()
+        return jsonify({"success": True, "data": data})
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to retrieve NDVI regions: {str(e)}"
+        }), 500
+
+
 @ndvi_bp.route('/current', methods=['GET'])
 def get_current_ndvi():
     """
@@ -214,12 +227,24 @@ def get_health_thresholds():
     """
     try:
         thresholds = []
+        range_labels = {
+            "Very Bad": "< 0.0",
+            "Bad": "0.0–0.1",
+            "Poor": "0.1–0.2",
+            "Moderate": "0.2–0.3",
+            "Good": "0.3–0.4",
+            "Very Good": "0.4–0.6",
+            "Excellent": "0.6–0.8",
+            "Very High": "> 0.8",
+        }
         for category, (min_val, max_val) in ndvi_service.health_thresholds.items():
             health = ndvi_service.classify_crop_health((min_val + max_val) / 2)
             thresholds.append({
                 "category": category,
                 "ndvi_range": {"min": min_val, "max": max_val},
+                "range_label": range_labels[category],
                 "description": health.get("description"),
+                "interpretation": health.get("interpretation"),
                 "color": health.get("color"),
                 "icon": health.get("icon"),
                 "action_required": health.get("action_required", False),
@@ -231,8 +256,8 @@ def get_health_thresholds():
             "success": True,
             "data": {
                 "thresholds": thresholds,
-                "note": "NDVI ranges based on agricultural research standards",
-                "source": "Research-validated thresholds for sugarcane"
+                "note": "Classification ranges are applied to the supplied mean NDVI values.",
+                "source": "User-provided mean NDVI classification ranges"
             }
         })
         
@@ -263,9 +288,9 @@ def get_service_status():
             },
             "data_sources": {
                 "realtime": "Sentinel-2 via Google Earth Engine" if ndvi_service.use_gee else "Not available",
-                "historical": "Cleaned NDVI CSV files (Belagavi, Mandya, Punjab, Tamil Nadu)"
+                "historical": "User-provided district NDVI averages (2026-01-01 through 2026-07-31)"
             },
-            "available_regions": ["Belagavi", "Mandya", "Punjab", "Tamil Nadu"],
+            "available_regions": ndvi_service.get_available_regions()["regions"],
             "satellite": {
                 "name": "Sentinel-2",
                 "resolution_meters": 10,

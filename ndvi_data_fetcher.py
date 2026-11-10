@@ -2,15 +2,7 @@
 NDVI Data Fetcher for Sugarcane Dataset
 ========================================
 
-Fetches NDVI (Normalized Difference Vegetation Index) time series data from:
-1. Google Earth Engine (Sentinel-2, Landsat 8/9)
-2. Existing NDVI CSVs in cleaned_data/
-3. Simulated NDVI based on growth patterns (fallback)
-
-NDVI Features:
-- Time series at different growth stages
-- Vegetation health indicators
-- Growth trend analysis
+Enriches records only with the supplied 2026 district-period NDVI averages.
 """
 
 import pandas as pd
@@ -39,8 +31,36 @@ class NDVIDataFetcher:
         
         print(f"📂 Loaded {len(self.df)} records for NDVI enrichment")
         
-        # Load existing NDVI datasets
-        self.ndvi_datasets = self._load_ndvi_datasets()
+        # The supplied district-period averages are the sole NDVI source.
+        self.period_ndvi_data = self._load_period_ndvi_data()
+
+    @staticmethod
+    def _normalize_location(value):
+        return ''.join(character for character in str(value).casefold() if character.isalnum())
+
+    def _load_period_ndvi_data(self):
+        """Load the active user-provided state/district NDVI period averages."""
+        repository_dir = os.path.dirname(os.path.abspath(__file__))
+        candidates = [
+            os.path.join(repository_dir, 'datasets', 'cleaned_data', 'NDVI_all_districts_complete.csv'),
+            os.path.join(self.ndvi_data_dir, 'NDVI_all_districts_complete.csv'),
+        ]
+        for filepath in candidates:
+            if os.path.isfile(filepath):
+                frame = pd.read_csv(filepath, dtype={'state': str, 'district': str})
+                required = {'state', 'district', 'ndvi', 'start_date', 'end_date'}
+                missing = required.difference(frame.columns)
+                if missing:
+                    raise ValueError(
+                        f"NDVI period dataset is missing required columns: {', '.join(sorted(missing))}"
+                    )
+                if frame.empty:
+                    raise ValueError(f"NDVI period dataset contains no records: {filepath}")
+                frame['ndvi'] = pd.to_numeric(frame['ndvi'], errors='raise')
+                return frame
+        raise FileNotFoundError(
+            "The supplied NDVI period dataset was not found in datasets/cleaned_data"
+        )
     
     def _load_ndvi_datasets(self):
         """Load all available NDVI CSV files"""
@@ -83,32 +103,18 @@ class NDVIDataFetcher:
         district = str(row.get('district', '')).lower()
         state = str(row.get('state', '')).lower()
         year = row.get('year')
-        
-        # Try to match by district name
-        for region, ndvi_df in self.ndvi_datasets.items():
-            if region in district or district in region:
-                # Filter by year if year column exists
-                if 'year' in ndvi_df.columns or 'Year' in ndvi_df.columns:
-                    year_col = 'year' if 'year' in ndvi_df.columns else 'Year'
-                    matched = ndvi_df[ndvi_df[year_col] == year]
-                else:
-                    matched = ndvi_df
-                
-                if len(matched) > 0:
-                    return self._extract_ndvi_features(matched)
-        
-        # Try to match by state
-        for region, ndvi_df in self.ndvi_datasets.items():
-            if region in state or state in region:
-                if 'year' in ndvi_df.columns or 'Year' in ndvi_df.columns:
-                    year_col = 'year' if 'year' in ndvi_df.columns else 'Year'
-                    matched = ndvi_df[ndvi_df[year_col] == year]
-                else:
-                    matched = ndvi_df
-                
-                if len(matched) > 0:
-                    return self._extract_ndvi_features(matched)
-        
+
+        # These are period averages, not a time series. Use the exact supplied
+        # NDVI value and leave per-day/stage features unavailable.
+        if not self.period_ndvi_data.empty and state and district:
+            state_key = self._normalize_location(state)
+            district_key = self._normalize_location(district)
+            matched_period = self.period_ndvi_data[
+                self.period_ndvi_data['state'].map(self._normalize_location).eq(state_key)
+                & self.period_ndvi_data['district'].map(self._normalize_location).eq(district_key)
+            ]
+            if not matched_period.empty:
+                return {'ndvi_mean': float(matched_period.iloc[-1]['ndvi'])}
         return None
     
     def _extract_ndvi_features(self, ndvi_df):
@@ -227,9 +233,8 @@ class NDVIDataFetcher:
         """
         Enrich dataset with NDVI data
         
-        Strategy:
-        1. Try to match from existing NDVI datasets
-        2. If no match, simulate realistic NDVI
+        Matching records receive their supplied district average. Unknown
+        locations remain without NDVI values; no fallback values are generated.
         
         Returns:
         --------
@@ -240,20 +245,21 @@ class NDVIDataFetcher:
         
         enriched_records = []
         matched_count = 0
-        simulated_count = 0
+        unavailable_count = 0
         
         for idx, row in self.df.iterrows():
             row_dict = row.to_dict()
+            for column in list(row_dict):
+                if column.lower().startswith('ndvi') or column.lower() == 'vegetation_health':
+                    row_dict.pop(column)
             
-            # Try to match existing NDVI data
             ndvi_features = self.match_ndvi_from_existing(row)
             
             if ndvi_features:
                 matched_count += 1
             else:
-                # Simulate realistic NDVI
-                ndvi_features = self.simulate_realistic_ndvi(row)
-                simulated_count += 1
+                ndvi_features = {}
+                unavailable_count += 1
             
             # Add NDVI features
             row_dict.update(ndvi_features)
@@ -276,8 +282,8 @@ class NDVIDataFetcher:
         enriched_df = pd.DataFrame(enriched_records)
         
         print(f"\n✅ NDVI enrichment complete:")
-        print(f"   Matched from existing data: {matched_count}")
-        print(f"   Simulated based on growth pattern: {simulated_count}")
+        print(f"   Matched supplied district averages: {matched_count}")
+        print(f"   No supplied district value: {unavailable_count}")
         
         return enriched_df
     
@@ -326,14 +332,7 @@ def main():
     )
     
     print("\n✅ NDVI enrichment complete!")
-    print("\nNote:")
-    print("- Used existing NDVI data where available")
-    print("- Simulated realistic NDVI for remaining records")
-    print("- For production, consider:")
-    print("  * Google Earth Engine API (requires authentication)")
-    print("  * Sentinel Hub API")
-    print("  * Planet Labs API")
-    print("  * Local satellite imagery processing")
+    print("\nOnly supplied 2026 district-period averages were used; other locations remain unpopulated.")
 
 
 if __name__ == "__main__":

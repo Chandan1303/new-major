@@ -1,16 +1,11 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import AuthLayout from '../layouts/AuthLayout';
+import LegalPageLayout from '../components/LegalPageLayout';
 
 export default function TermsOfUsePage() {
   return (
-    <AuthLayout compact>
-      <div className="legal-content">
-        <Link to="/login" className="back-link">← Back to Login</Link>
-        
-        <h2>Terms of Use</h2>
-        
-        <div className="legal-text">
+    <LegalPageLayout
+      title="Terms of Use"
+      description="The terms that apply when you use SugarYield AI’s crop and farm decision support tools."
+    >
           <section>
             <h3>1. Acceptance of Terms</h3>
             <p>
@@ -73,8 +68,6 @@ export default function TermsOfUsePage() {
           <p className="legal-footer">
             Last updated: January 2024
           </p>
-        </div>
-      </div>
-    </AuthLayout>
+    </LegalPageLayout>
   );
 }

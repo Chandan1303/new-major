@@ -12,6 +12,7 @@ import {
   Dna,
   TrendingDown,
   BookOpen,
+  Droplets,
   LineChart,
   FileText,
   User,
@@ -43,6 +44,7 @@ const USER_NAV = [
     { label: 'Yield prediction', path: '/prediction',  icon: TrendingUp },
     { label: 'Crop Growth Monitor', path: '/crop-intelligence', icon: Sprout },
     { label: 'Variety Growing Guide', path: '/growing-guide', icon: BookOpen },
+    { label: 'Soil & Planting Guide', path: '/agronomy-guide', icon: Droplets },
   ]},
   { group: 'Environment', items: [
     { label: 'NDVI Crop Health', path: '/crop-health', icon: Sprout },

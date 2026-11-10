@@ -22,6 +22,7 @@ import SimulatorPage   from './pages/SimulatorPage';
 import CropHealthPage   from './pages/CropHealthPage';
 import CropIntelligencePage from './crop-intelligence/CropIntelligencePage';
 import VarietyGrowingGuidePage from './pages/VarietyGrowingGuidePage';
+import AgronomyGuidePage from './pages/AgronomyGuidePage';
 import WeatherPage      from './pages/WeatherPage';
 import SoilPage         from './pages/SoilPage';
 import VarietiesPage    from './pages/VarietiesPage';
@@ -77,6 +78,7 @@ export default function App() {
       <Route path="/crop-health" element={<UserRoute><CropHealthPage /></UserRoute>} />
       <Route path="/crop-intelligence" element={<UserRoute><CropIntelligencePage /></UserRoute>} />
       <Route path="/growing-guide" element={<UserRoute><VarietyGrowingGuidePage /></UserRoute>} />
+      <Route path="/agronomy-guide" element={<UserRoute><AgronomyGuidePage /></UserRoute>} />
       <Route path="/weather"     element={<UserRoute><WeatherPage /></UserRoute>} />
       <Route path="/soil"        element={<UserRoute><SoilPage /></UserRoute>} />
       <Route path="/varieties"   element={<UserRoute><VarietiesPage /></UserRoute>} />

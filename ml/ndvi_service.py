@@ -61,14 +61,16 @@ class NDVIService:
             self.historical_data_dirs[0],
         )
         
-        # NDVI Health Classification Thresholds (Research-based)
+        # User-provided mean-NDVI classification bands.
         self.health_thresholds = {
-            "Excellent": (0.7, 1.0),    # Dense, healthy vegetation
-            "Good": (0.6, 0.7),         # Healthy vegetation
-            "Moderate": (0.4, 0.6),     # Moderate vegetation
-            "Fair": (0.3, 0.4),         # Sparse vegetation
-            "Poor": (0.2, 0.3),         # Very sparse vegetation
-            "Critical": (0.0, 0.2)      # Bare soil / stressed crops
+            "Very Bad": (-1.0, 0.0),
+            "Bad": (0.0, 0.1),
+            "Poor": (0.1, 0.2),
+            "Moderate": (0.2, 0.3),
+            "Good": (0.3, 0.4),
+            "Very Good": (0.4, 0.6),
+            "Excellent": (0.6, 0.8),
+            "Very High": (0.8, 1.0),
         }
         
         # Initialize GEE if available
@@ -220,91 +222,96 @@ class NDVIService:
         --------
         dict : Health classification with category, description, color, recommendations
         """
-        # Determine category
-        category = "Unknown"
-        for cat, (min_val, max_val) in self.health_thresholds.items():
-            if min_val <= ndvi < max_val:
-                category = cat
-                break
+        # 0.8 belongs to Excellent; only values strictly above 0.8 are Very High.
+        if ndvi < 0.0:
+            category = "Very Bad"
+        elif ndvi < 0.1:
+            category = "Bad"
+        elif ndvi < 0.2:
+            category = "Poor"
+        elif ndvi < 0.3:
+            category = "Moderate"
+        elif ndvi < 0.4:
+            category = "Good"
+        elif ndvi < 0.6:
+            category = "Very Good"
+        elif ndvi <= 0.8:
+            category = "Excellent"
+        else:
+            category = "Very High"
         
         # Detailed descriptions and recommendations
         health_info = {
-            "Excellent": {
-                "description": "Dense, healthy vegetation with optimal growth",
-                "color": "#10b981",  # Green
-                "icon": "✅",
-                "recommendations": [
-                    "Maintain current irrigation and fertilization schedule",
-                    "Monitor for pest/disease despite good health",
-                    "Continue optimal management practices"
-                ],
-                "action_required": False
-            },
-            "Good": {
-                "description": "Healthy vegetation with good biomass",
-                "color": "#22c55e",  # Light green
-                "icon": "✓",
-                "recommendations": [
-                    "Maintain good agricultural practices",
-                    "Regular monitoring for any stress signs",
-                    "Continue balanced nutrient management"
-                ],
-                "action_required": False
-            },
-            "Moderate": {
-                "description": "Moderate vegetation health, some improvement possible",
-                "color": "#eab308",  # Yellow
-                "icon": "⚠",
-                "recommendations": [
-                    "Check irrigation adequacy",
-                    "Consider soil nutrient testing",
-                    "Monitor for water stress or nutrient deficiency",
-                    "Increase monitoring frequency"
-                ],
+            "Very Bad": {
+                "description": "Water or non-vegetated surfaces",
+                "interpretation": "Water, non-vegetated surfaces",
+                "color": "#991b1b",
+                "icon": "●",
+                "recommendations": ["Confirm the map location and inspect the area before interpreting crop condition"],
                 "action_required": True,
-                "priority": "Medium"
+                "priority": "High"
             },
-            "Fair": {
-                "description": "Sparse vegetation, stress indicators present",
-                "color": "#f97316",  # Orange
-                "icon": "⚠️",
-                "recommendations": [
-                    "Immediate irrigation assessment required",
-                    "Check for pest/disease infestation",
-                    "Soil analysis recommended",
-                    "Consider fertilizer application"
-                ],
+            "Bad": {
+                "description": "Bare soil or built-up areas",
+                "interpretation": "Bare soil or built-up areas",
+                "color": "#dc2626",
+                "icon": "●",
+                "recommendations": ["Check whether the mapped area contains planted sugarcane"],
                 "action_required": True,
                 "priority": "High"
             },
             "Poor": {
-                "description": "Very sparse vegetation, significant stress",
-                "color": "#ef4444",  # Red
-                "icon": "❌",
-                "recommendations": [
-                    "URGENT: Field inspection required",
-                    "Check irrigation system immediately",
-                    "Assess for disease/pest damage",
-                    "Consult agricultural expert",
-                    "Consider corrective fertilization"
-                ],
+                "description": "Very sparse vegetation",
+                "interpretation": "Very sparse vegetation",
+                "color": "#f97316",
+                "icon": "●",
+                "recommendations": ["Inspect crop establishment and check for water or nutrient stress"],
                 "action_required": True,
-                "priority": "Critical"
+                "priority": "Medium"
             },
-            "Critical": {
-                "description": "Bare soil or severely stressed crops",
-                "color": "#dc2626",  # Dark red
-                "icon": "🚨",
-                "recommendations": [
-                    "CRITICAL: Immediate action required",
-                    "Emergency field inspection",
-                    "Assess crop viability",
-                    "Check for complete irrigation failure",
-                    "Expert consultation mandatory",
-                    "Document for insurance/government support"
-                ],
+            "Moderate": {
+                "description": "Sparse vegetation",
+                "interpretation": "Sparse vegetation",
+                "color": "#ca8a04",
+                "icon": "●",
+                "recommendations": ["Check crop cover and monitor irrigation and nutrient conditions"],
                 "action_required": True,
-                "priority": "Emergency"
+                "priority": "Medium"
+            },
+            "Good": {
+                "description": "Moderate vegetation",
+                "interpretation": "Moderate vegetation",
+                "color": "#65a30d",
+                "icon": "●",
+                "recommendations": ["Continue routine crop monitoring and management"],
+                "action_required": False
+            },
+            "Very Good": {
+                "description": "Healthy vegetation",
+                "interpretation": "Healthy vegetation",
+                "color": "#22c55e",
+                "icon": "●",
+                "recommendations": ["Maintain current crop management and continue monitoring"],
+                "action_required": False
+            },
+            "Excellent": {
+                "description": "Dense, healthy vegetation",
+                "interpretation": "Dense, healthy vegetation",
+                "color": "#16a34a",
+                "icon": "✅",
+                "recommendations": [
+                    "Maintain current crop management",
+                    "Continue routine monitoring"
+                ],
+                "action_required": False
+            },
+            "Very High": {
+                "description": "Extremely dense vegetation",
+                "interpretation": "Extremely dense vegetation",
+                "color": "#047857",
+                "icon": "✅",
+                "recommendations": ["Continue monitoring; verify dense cover reflects the intended crop area"],
+                "action_required": False
             }
         }
         
@@ -322,6 +329,42 @@ class NDVIService:
         
         return result
     
+    def _load_updated_period_ndvi(self) -> pd.DataFrame:
+        """Load the active 2026 state/district NDVI snapshot."""
+        data_file = self.base_dir / "datasets" / "cleaned_data" / "NDVI_all_districts_complete.csv"
+        if not data_file.is_file():
+            return pd.DataFrame()
+        try:
+            frame = pd.read_csv(data_file, dtype={"state": str, "district": str})
+            required = {"state", "district", "ndvi", "start_date", "end_date"}
+            return frame if required.issubset(frame.columns) else pd.DataFrame()
+        except (OSError, pd.errors.ParserError, ValueError):
+            return pd.DataFrame()
+
+    @staticmethod
+    def _region_key(value: str) -> str:
+        return "".join(character for character in str(value).casefold() if character.isalnum())
+
+    def get_available_regions(self) -> Dict:
+        """Return states, districts, and date coverage from the active snapshot."""
+        frame = self._load_updated_period_ndvi()
+        if frame.empty:
+            return {"period": None, "regions": []}
+
+        regions = []
+        for state, rows in frame.groupby("state", sort=True):
+            regions.append({
+                "state": state,
+                "districts": sorted(rows["district"].dropna().astype(str).unique().tolist()),
+            })
+        return {
+            "period": {
+                "start_date": str(frame["start_date"].min()),
+                "end_date": str(frame["end_date"].max()),
+            },
+            "regions": regions,
+        }
+
     def get_historical_ndvi(
         self, 
         state: str, 
@@ -344,6 +387,50 @@ class NDVIService:
         --------
         dict : Historical NDVI statistics
         """
+        # This snapshot replaces legacy synthetic/historical district files.
+        # Do not fall through to those files when a location is absent here.
+        updated_frame = self._load_updated_period_ndvi()
+        if updated_frame.empty:
+            return {"error": "The supplied 2026 NDVI dataset is unavailable"}
+
+        state_key = self._region_key(state)
+        district_key = self._region_key(district)
+        selected = updated_frame[
+            updated_frame["state"].map(self._region_key).eq(state_key)
+            & updated_frame["district"].map(self._region_key).eq(district_key)
+        ]
+        if selected.empty:
+            return {
+                "error": f"No supplied NDVI record for {district}, {state}",
+                "available_regions": self.get_available_regions()["regions"],
+            }
+
+        row = selected.iloc[-1]
+        value = float(row["ndvi"])
+        health = self.classify_crop_health(value)
+        period_start = str(row["start_date"])
+        period_end = str(row["end_date"])
+        stats = {
+            "source": "User-provided district period average",
+            "region": district,
+            "state": state,
+            "district": district,
+            "total_records": 1,
+            "ndvi_mean": value,
+            "ndvi_median": value,
+            "ndvi_std": 0.0,
+            "ndvi_min": value,
+            "ndvi_max": value,
+            "ndvi_p25": value,
+            "ndvi_p75": value,
+            "observation_date": period_end,
+            "start_date": period_start,
+            "end_date": period_end,
+            "period": {"start_date": period_start, "end_date": period_end},
+            "average_health": health,
+        }
+        return {"success": True, "data": stats}
+
         # Map districts to NDVI regions (all 85 districts)
         district_to_region_file = {
             # Karnataka - 12 districts
@@ -582,33 +669,19 @@ class NDVIService:
             }
         }
         
-        # Try GEE first if coordinates provided
-        if self.use_gee and latitude and longitude:
-            end_date = datetime.now().strftime('%Y-%m-%d')
-            start_date = (datetime.now() - timedelta(days=days_back)).strftime('%Y-%m-%d')
-            
-            gee_result = self.calculate_ndvi_gee(latitude, longitude, start_date, end_date)
-            
-            if gee_result.get("success"):
-                result["ndvi_data"] = gee_result
-                result["data_source"] = "realtime"
-                return result
-            else:
-                result["gee_error"] = gee_result.get("error")
-                result["fallback_reason"] = gee_result.get("reason")
-        
-        # Fallback to historical data
+        # The supplied district-period snapshot is authoritative for this
+        # endpoint; never substitute live, legacy, or generated NDVI values.
         if state and district:
             historical = self.get_historical_ndvi(state, district)
             if historical.get("success"):
                 result["ndvi_data"] = historical["data"]
                 result["data_source"] = "historical"
-                result["note"] = "Using historical NDVI data for this region"
+                result["note"] = "Using the supplied 2026 district-period average"
                 return result
-            else:
-                result["error"] = historical.get("error")
-        
-        result["error"] = "Unable to retrieve NDVI data (no GEE access and no historical data)"
+            result["error"] = historical.get("error")
+            return result
+
+        result["error"] = "State and district are required to retrieve a supplied NDVI average"
         return result
 
 

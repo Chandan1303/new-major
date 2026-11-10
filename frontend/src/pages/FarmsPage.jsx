@@ -347,10 +347,10 @@ export default function FarmsPage() {
   return (
     <AppLayout>
       <Toaster position="top-right" />
-      <div className="page-container">
+      <div className="page-container farms-page">
         
         {/* Page Header */}
-        <div className="page-header" style={{ marginBottom: 24 }}>
+        <div className="page-header farms-page-header" style={{ marginBottom: 24 }}>
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 20, background: 'rgba(16, 185, 129, 0.1)', color: 'var(--primary)', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
               <Building2 size={13} /> Precision Land Tenure & Parcel Intelligence
@@ -373,7 +373,7 @@ export default function FarmsPage() {
         </div>
 
         {/* Global Holdings Overview Stats */}
-        <div className="dashboard-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', marginBottom: 24 }}>
+        <div className="dashboard-stats farms-overview-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', marginBottom: 24 }}>
           <StatCard
             label="Total Farms Registered"
             value={farms.length}
@@ -419,8 +419,8 @@ export default function FarmsPage() {
 
         {/* Farm Selector Ribbon */}
         {farms.length > 0 && (
-          <div style={{ marginBottom: 24 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+          <div className="farm-selector-section" style={{ marginBottom: 24 }}>
+            <div className="farm-selector-heading" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
               <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Select Agricultural Estate ({farms.length} Registered)
               </span>
@@ -428,12 +428,13 @@ export default function FarmsPage() {
                 Active: <strong style={{ color: 'var(--primary)' }}>{activeFarm?.name || 'None'}</strong>
               </span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'stretch', gap: 12, overflowX: 'auto', paddingBottom: 8 }}>
+            <div className="farm-selector-list" style={{ display: 'flex', alignItems: 'stretch', gap: 12, overflowX: 'auto', paddingBottom: 8 }}>
               {farms.map(f => {
                 const isSelected = activeFarm?.id === f.id;
                 return (
                   <button
                     key={f.id}
+                    className="farm-selector-card"
                     onClick={() => { setActiveFarm(f); selectFarm(f.id); }}
                     style={{
                       display: 'flex',
@@ -490,11 +491,11 @@ export default function FarmsPage() {
             onAction={openAddFarm}
           />
         ) : activeFarm && (
-          <div className="card" style={{ padding: 24, borderRadius: 18, border: '1px solid var(--border-color)', background: 'var(--card-bg)', marginBottom: 30 }}>
+          <div className="card active-holding-card" style={{ padding: 24, borderRadius: 18, border: '1px solid var(--border-color)', background: 'var(--card-bg)', marginBottom: 30 }}>
             
             {/* Farm Active Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, paddingBottom: 20, borderBottom: '1px solid var(--border-color)', marginBottom: 24 }}>
-              <div>
+            <div className="active-holding-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, paddingBottom: 20, borderBottom: '1px solid var(--border-color)', marginBottom: 24 }}>
+              <div className="active-holding-details">
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
                   <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--text-primary)' }}>{activeFarm.name}</h2>
                   <Badge variant="success">Active Tenure</Badge>
@@ -514,8 +515,8 @@ export default function FarmsPage() {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', gap: 8, marginRight: 8 }}>
+              <div className="active-holding-tools" style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <div className="active-holding-metrics" style={{ display: 'flex', gap: 8, marginRight: 8 }}>
                   <div style={{ padding: '6px 12px', borderRadius: 8, background: 'var(--bg-tertiary)', textAlign: 'center' }}>
                     <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{Number(activeFarm.total_area).toFixed(1)} ha</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Holding Area</div>
@@ -536,7 +537,7 @@ export default function FarmsPage() {
             </div>
 
             {/* Fields Grid */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+            <div className="active-field-heading" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
                   Active Field Parcels ({activeFarm.fields?.length || 0})
@@ -559,7 +560,7 @@ export default function FarmsPage() {
                 onAction={openAddField}
               />
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 20 }}>
+              <div className="active-fields-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 20 }}>
                 {activeFarm.fields.map(field => {
                   const { days, stageIdx, currentStage, progressPct, condition, conditionBadge, estHarvest, daysToHarvest } = getStageAndProgress(
                     field.planting_date, field.soil_moisture == null ? null : Number(field.soil_moisture), field.soil_moisture_recorded_at
@@ -575,6 +576,7 @@ export default function FarmsPage() {
                   return (
                     <div
                       key={field.id}
+                      className="field-parcel-card"
                       style={{
                         background: 'var(--bg-secondary)',
                         border: '1px solid var(--border-color)',

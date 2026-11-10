@@ -268,7 +268,7 @@ class AgronomicReportGenerator:
         json_path = self.output_dir / f"{report_id}.json"
         try:
             with open(json_path, "w", encoding="utf-8") as f:
-            json.dump(report, f, indent=2, default=str)
+                json.dump(report, f, indent=2, default=str)
         except Exception:
             pass
 

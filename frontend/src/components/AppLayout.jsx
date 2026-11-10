@@ -5,7 +5,7 @@ import {
   LayoutDashboard,
   MapPin,
   Map,
-  Sparkles,
+  TrendingUp,
   Sprout,
   CloudSun,
   Layers,
@@ -39,8 +39,8 @@ const USER_NAV = [
     { label: 'My Farm & Fields', path: '/farms',       icon: MapPin },
     { label: 'Interactive Map',  path: '/farm-map',    icon: Map },
   ]},
-  { group: 'AI & Intelligence', items: [
-    { label: 'AI Yield Predict', path: '/prediction',  icon: Sparkles, highlight: true },
+  { group: 'Crop intelligence', items: [
+    { label: 'Yield prediction', path: '/prediction',  icon: TrendingUp },
     { label: 'Crop Growth Monitor', path: '/crop-intelligence', icon: Sprout },
     { label: 'Variety Growing Guide', path: '/growing-guide', icon: BookOpen },
   ]},
@@ -122,9 +122,9 @@ export default function AppLayout({ children }) {
     return location.pathname === itemPath;
   };
 
-  const roleColor = '#10b981';
-  const roleBadgeBg = 'rgba(16, 185, 129, 0.12)';
-  const roleBadgeBorder = 'rgba(16, 185, 129, 0.25)';
+  const roleColor = 'var(--primary-dark)';
+  const roleBadgeBg = 'var(--primary-light)';
+  const roleBadgeBorder = 'var(--border)';
   const roleTitle = 'Sugarcane Grower';
   const RoleIcon = Sprout;
 
@@ -153,7 +153,6 @@ export default function AppLayout({ children }) {
             <span className="sidebar-role-text" style={{ color: roleColor }}>
               {roleTitle}
             </span>
-            <span className="sidebar-role-online-dot" style={{ background: roleColor }} />
           </div>
         )}
 
@@ -192,8 +191,7 @@ export default function AppLayout({ children }) {
               <div
                 className="sidebar-avatar"
                 style={{
-                  background: `linear-gradient(135deg, ${roleColor}, #059669)`,
-                  boxShadow: `0 0 12px ${roleColor}40`
+                  background: 'var(--primary-dark)',
                 }}
               >
                 {user?.name?.[0]?.toUpperCase() || 'U'}
@@ -303,7 +301,7 @@ export default function AppLayout({ children }) {
               title={`Logged in as ${user?.name || roleTitle}`}
               aria-label="View Profile"
               style={{
-                background: `linear-gradient(135deg, ${roleColor}, #059669)`,
+                background: 'var(--primary-dark)',
               }}
             >
               <span>{user?.name?.[0]?.toUpperCase() || 'U'}</span>

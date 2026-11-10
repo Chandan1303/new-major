@@ -13,7 +13,6 @@ import {
   Warehouse,
   Sprout,
   MapPin,
-  Sparkles,
   TrendingUp,
   ShieldCheck,
   AlertTriangle,
@@ -34,12 +33,10 @@ import {
 import AppLayout from '../components/AppLayout';
 import StatCard from '../components/ui/StatCard';
 import Badge from '../components/ui/Badge';
-import { useAuth } from '../context/AuthContext';
 import { useField } from '../context/FieldContext';
 import { dashboardApi, alertApi, advisorApi, irrigationApi, farmApi } from '../services/api';
 
 export default function NewDashboardPage() {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const { farms: ctxFarms, selectedFarm, selectedField, selectFarm, selectField } = useField();
 
@@ -134,8 +131,6 @@ export default function NewDashboardPage() {
       })
       .catch(() => {});
   }, [selectedFieldId, selectedField]);
-
-  const firstName = user?.name?.split(' ')[0] || 'Grower';
 
   const predictionPath = () => {
     const params = new URLSearchParams();
@@ -255,7 +250,7 @@ export default function NewDashboardPage() {
       <AppLayout>
         <div className="page-container">
           <div className="error-banner" style={{ background: '#fef2f2', border: '1px solid #fecaca', padding: '16px 20px', borderRadius: 12, color: '#991b1b', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span>⚠️ {error}</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><AlertTriangle size={16} />{error}</span>
             <button className="btn-outline" onClick={() => window.location.reload()} style={{ padding: '6px 12px', fontSize: 13 }}>Retry Connection</button>
           </div>
         </div>
@@ -270,12 +265,12 @@ export default function NewDashboardPage() {
         <div className="page-header dashboard-hero" style={{ marginBottom: 24 }}>
           <div>
             <span className="eyebrow">
-              <Sparkles size={13} />
-              Enterprise Agricultural AI Platform
+              <MapPin size={14} />
+              Field overview
             </span>
-            <h1 className="page-title">Welcome back, {firstName} 👋</h1>
+            <h1 className="page-title">Your fields</h1>
             <p className="page-subtitle">
-              Multi-farm agronomic intelligence & telemetry — {new Date().toLocaleDateString('en-IN', { dateStyle: 'long' })}
+              Yield outlook and current field conditions · {new Date().toLocaleDateString('en-IN', { dateStyle: 'long' })}
             </p>
           </div>
           <div className="header-actions" style={{ display: 'flex', gap: 10 }}>
@@ -284,7 +279,7 @@ export default function NewDashboardPage() {
               <span>Interactive Map</span>
             </button>
             <button className="btn-primary" onClick={() => navigate(predictionPath())}>
-              <Sparkles size={16} />
+              <TrendingUp size={16} />
               <span>Predict Yield</span>
             </button>
           </div>
@@ -298,9 +293,9 @@ export default function NewDashboardPage() {
                 <Filter size={18} />
               </div>
               <div>
-                <strong style={{ fontSize: 13.5, color: 'var(--text-primary)' }}>Holdings Scope & Telemetry View:</strong>
+                <strong style={{ fontSize: 13.5, color: 'var(--text-primary)' }}>Farm and field filters</strong>
                 <span style={{ fontSize: 12, color: 'var(--text-muted)', display: 'block' }}>
-                  Filter dashboard metrics by individual farm estate and field parcel
+                  Choose which records appear in the dashboard
                 </span>
               </div>
             </div>
@@ -314,7 +309,7 @@ export default function NewDashboardPage() {
                   value={selectedFarmId}
                   onChange={handleFarmFilterChange}
                 >
-                  <option value="all">🏡 All Farms (Multi-Farm Overview)</option>
+                  <option value="all">All farms</option>
                   {effectiveFarms.map(f => (
                     <option key={f.id} value={String(f.id)}>
                       {f.name} ({f.location || 'Maharashtra'})
@@ -331,7 +326,7 @@ export default function NewDashboardPage() {
                   value={selectedFieldId}
                   onChange={handleFieldFilterChange}
                 >
-                  <option value="all">🌱 All Fields</option>
+                  <option value="all">All fields</option>
                   {availableFields.map(fld => (
                     <option key={fld.id} value={String(fld.id)}>
                       {fld.name}{selectedFarmId === 'all' && fld.farm_name ? ` · ${fld.farm_name}` : ''} ({fld.sugarcane_variety || 'Variety unavailable'})
@@ -365,7 +360,7 @@ export default function NewDashboardPage() {
             icon={Warehouse}
             label="Total Farms"
             value={calculatedMetrics.totalFarms}
-            color="#0ea5e9"
+            color="#527c58"
             subtitle="Registered agricultural estates"
             onClick={() => navigate('/farms')}
           />
@@ -373,7 +368,7 @@ export default function NewDashboardPage() {
             icon={Sprout}
             label="Total Fields"
             value={calculatedMetrics.totalFields}
-            color="#10b981"
+            color="#527c58"
             subtitle="Active cane cultivation parcels"
             onClick={() => navigate('/farms')}
           />
@@ -382,7 +377,7 @@ export default function NewDashboardPage() {
             label="Cultivated Area"
             value={calculatedMetrics.totalArea.toFixed(1)}
             unit="ha"
-            color="#059669"
+            color="#527c58"
             subtitle="Total monitored surface"
             onClick={() => navigate('/farms')}
           />
@@ -391,17 +386,17 @@ export default function NewDashboardPage() {
             label="Expected Production"
             value={calculatedMetrics.totalExpectedProduction == null ? 'Not available' : Math.round(calculatedMetrics.totalExpectedProduction).toLocaleString('en-IN')}
             unit="Tonnes"
-            color="#047857"
+            color="#527c58"
             subtitle="Forecasted regional tonnage"
             onClick={() => navigate(predictionPath())}
           />
           <StatCard
-            icon={Sparkles}
+            icon={Sprout}
             label="Avg Predicted Yield"
             value={calculatedMetrics.avgYield == null ? 'Not available' : calculatedMetrics.avgYield.toFixed(1)}
             unit="t/ha"
             change={undefined}
-            color="#10b981"
+            color="#527c58"
             subtitle="Random Forest final yield; XGBoost comparison"
             onClick={() => navigate(predictionPath())}
           />
@@ -409,7 +404,7 @@ export default function NewDashboardPage() {
             icon={BarChart3}
             label="Model Confidence"
             value={calculatedMetrics.avgConfidence == null ? 'Not available' : `${Math.round(calculatedMetrics.avgConfidence)}%`}
-            color="#8b5cf6"
+            color="#527c58"
             subtitle="Ensemble consensus score"
             onClick={() => navigate('/insights')}
           />
@@ -417,7 +412,7 @@ export default function NewDashboardPage() {
             icon={ShieldCheck}
             label="Normal Fields"
             value={calculatedMetrics.normalFields}
-            color="#10b981"
+            color="#527c58"
             subtitle="Fields with a current normal assessment"
             onClick={() => navigate('/farms')}
           />
@@ -433,9 +428,9 @@ export default function NewDashboardPage() {
 
         {/* IRRIGATION DECISION SUPPORT BANNER */}
         {irrigation && (
-          <div className="card" style={{
-            background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%)',
-            border: '1.5px solid rgba(14, 165, 233, 0.25)',
+              <div className="card" style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
             padding: '18px 22px',
             marginBottom: 24
           }}>
@@ -481,13 +476,13 @@ export default function NewDashboardPage() {
         <div className="card" style={{ padding: '22px 24px', marginBottom: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(139, 92, 246, 0.12)', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Sparkles size={20} />
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--primary-light)', color: 'var(--primary-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Sprout size={20} />
               </div>
               <div>
-                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>AI Farm Advisor & Surveillance Directives</h3>
+                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Field recommendations</h3>
                 <p style={{ margin: '2px 0 0', fontSize: 12.5, color: 'var(--text-muted)' }}>
-                  Real-time agronomic suggestions grounded in live soil, weather, crop phenology, and yield models.
+                  Suggestions based on the soil, weather and crop data available for each field.
                 </p>
               </div>
             </div>
@@ -498,7 +493,7 @@ export default function NewDashboardPage() {
             {advisorData.length === 0 ? (
               <div style={{ gridColumn: '1 / -1', padding: '24px', background: 'var(--border-subtle)', borderRadius: 12, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13.5 }}>
                 <ShieldCheck size={28} style={{ color: '#10b981', margin: '0 auto 8px', display: 'block' }} />
-                All monitored parcels are currently in optimal condition. No urgent interventions needed.
+                No field recommendations are available for this selection.
               </div>
             ) : (
               advisorData.slice(0, 3).map((item, idx) => (
@@ -641,7 +636,7 @@ export default function NewDashboardPage() {
             ) : (
               <div style={{ textAlign: 'center', padding: '36px 16px', color: 'var(--text-muted)' }}>
                 <ShieldCheck size={32} style={{ color: '#10b981', margin: '0 auto 8px' }} />
-                <p style={{ margin: 0, fontSize: 13.5 }}>All farm parameters nominal. Good conditions!</p>
+                <p style={{ margin: 0, fontSize: 13.5 }}>No current recommendations are available for these fields.</p>
               </div>
             )}
           </div>
@@ -649,14 +644,14 @@ export default function NewDashboardPage() {
 
         {/* QUICK ACTIONS BAR */}
         <div className="card" style={{ padding: '16px 20px' }}>
-          <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--text-muted)', marginBottom: 12 }}>
-            ⚡ Fast Platform Access
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 12 }}>
+            Farm tools
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10 }}>
             {[
               { icon: Warehouse, label: 'Register Farm', path: '/farms' },
               { icon: Sprout, label: 'Add Field', path: '/farms' },
-              { icon: Sparkles, label: 'Predict Yield',   path: '/prediction' },
+              { icon: TrendingUp, label: 'Predict Yield',   path: '/prediction' },
               { icon: MapIcon, label: 'Interactive Map', path: '/farm-map' },
               { icon: Globe, label: 'NDVI Health',       path: '/crop-health' },
               { icon: Sprout, label: 'Crop Monitoring', path: '/crop-intelligence' },

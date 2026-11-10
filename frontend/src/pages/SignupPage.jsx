@@ -64,7 +64,7 @@ export default function SignupPage() {
         {registrationSuccess ? (
           <div className="auth-rebuilt-success-content">
             <div className="auth-rebuilt-success-icon"><CheckCircle2 size={34} /></div>
-            <div className="auth-rebuilt-eyebrow"><Sprout size={15} /> ONE LAST STEP</div>
+            <div className="auth-rebuilt-eyebrow"><Sprout size={15} /> Verify your email</div>
             <h2 id="signup-heading">Check your inbox</h2>
             <p className="auth-rebuilt-intro">We sent a verification link to <strong>{userEmail}</strong>. Verify your email to activate your account.</p>
             <div className="auth-rebuilt-notice">If the email doesn’t arrive soon, check your spam folder or <Link to="/resend-verification">request another verification link</Link>.</div>
@@ -76,9 +76,9 @@ export default function SignupPage() {
               <Link className="auth-rebuilt-tab" to="/login">Sign in</Link>
               <span className="auth-rebuilt-tab is-active" aria-current="page">Create account</span>
             </nav>
-            <div className="auth-rebuilt-eyebrow"><Sprout size={15} /> JOIN SUGARYIELD AI</div>
+            <div className="auth-rebuilt-eyebrow"><Sprout size={15} /> Grower account</div>
             <h2 id="signup-heading">Create your account</h2>
-            <p className="auth-rebuilt-intro">Start your journey toward smarter, more productive farming.</p>
+            <p className="auth-rebuilt-intro">Create an account to keep your farm records and field forecasts together.</p>
 
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
               <div className="auth-rebuilt-field">

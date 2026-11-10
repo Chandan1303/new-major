@@ -44,9 +44,9 @@ export default function StatCard({
         <div
           className="sc-icon-wrap"
           style={{
-            background: `linear-gradient(135deg, ${color}20, ${color}08)`,
-            color: color,
-            borderColor: `${color}30`
+            background: 'color-mix(in srgb, var(--primary) 11%, var(--bg-card))',
+            color: 'var(--primary-dark)',
+            borderColor: 'var(--border)'
           }}
         >
           {renderIcon()}

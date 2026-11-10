@@ -44,28 +44,26 @@ export default function AuthLayout({ children, compact = false, variant = 'legac
     return (
       <main className="auth-rebuilt-shell">
         <aside className="auth-rebuilt-hero">
-          <div className="auth-rebuilt-ambient auth-rebuilt-ambient-one" aria-hidden="true" />
-          <div className="auth-rebuilt-ambient auth-rebuilt-ambient-two" aria-hidden="true" />
           <div className="auth-rebuilt-hero-top">
             <Brand />
-            <span className="auth-rebuilt-caption">INTELLIGENCE FOR EVERY GROWING SEASON</span>
+            <span className="auth-rebuilt-caption">Sugarcane field management</span>
           </div>
           <div className="auth-rebuilt-hero-copy">
-            <div className="auth-rebuilt-pill"><span /><Sprout size={14} />SUGARCANE INTELLIGENCE <i /> FARM-FOCUSED</div>
-            <div className="auth-rebuilt-overline">A smarter way to understand your field</div>
-            <h1>Better insight.<br /><em>Stronger harvests.</em></h1>
+            <div className="auth-rebuilt-pill"><Sprout size={14} /> Sugarcane field intelligence</div>
+            <div className="auth-rebuilt-overline">Field records and yield outlook</div>
+            <h1>Understand each field.<br /><em>Plan the next step.</em></h1>
             <p>One connected place to explore yield forecasts, review field conditions, and plan your next farming decisions.</p>
-            <div className="auth-rebuilt-feature-heading"><span>TOOLS FOR YOUR FARM</span><span className="auth-rebuilt-feature-rule" /></div>
+            <div className="auth-rebuilt-feature-heading"><span>Farm tools</span><span className="auth-rebuilt-feature-rule" /></div>
             <div className="auth-rebuilt-features">
               <div className="auth-rebuilt-feature"><span className="auth-rebuilt-feature-icon"><TrendingUp size={19} strokeWidth={2.2} /></span><div><strong>Yield forecasting</strong><small>Explore estimates from your farm inputs.</small></div><span className="auth-rebuilt-feature-index">01</span></div>
               <div className="auth-rebuilt-feature"><span className="auth-rebuilt-feature-icon"><CloudSun size={19} strokeWidth={2.1} /></span><div><strong>Weather and soil insights</strong><small>Review the field information available to you.</small></div><span className="auth-rebuilt-feature-index">02</span></div>
               <div className="auth-rebuilt-feature"><span className="auth-rebuilt-feature-icon"><Sprout size={19} strokeWidth={2.1} /></span><div><strong>Practical farm decisions</strong><small>Keep records and planning in one place.</small></div><span className="auth-rebuilt-feature-index">03</span></div>
             </div>
           </div>
-          <footer className="auth-rebuilt-hero-footer"><span><Sprout size={14} />SugarYield AI <i /> Sugarcane decision support</span><span><ShieldCheck size={13} />FARMER-CENTRED DESIGN</span></footer>
+          <footer className="auth-rebuilt-hero-footer"><span><Sprout size={14} /> SugarYield AI <i /> Sugarcane decision support</span><span><ShieldCheck size={13} /> Farmer-centred design</span></footer>
         </aside>
         <section className="auth-rebuilt-main">
-          <div className="auth-rebuilt-mobile-brand"><Brand /><span>INTELLIGENCE FOR EVERY GROWING SEASON</span></div>
+          <div className="auth-rebuilt-mobile-brand"><Brand /><span>Sugarcane field management</span></div>
           <div className="auth-rebuilt-card-wrap">{children}</div>
         </section>
       </main>

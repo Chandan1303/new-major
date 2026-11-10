@@ -18,6 +18,7 @@ import {
   Sun,
   Cloud,
   CloudLightning,
+  Activity,
   Droplets,
   Wind,
   Thermometer,
@@ -27,7 +28,7 @@ import {
   ArrowRight,
   MapPin,
   Calendar,
-  Sparkles,
+  TrendingUp,
   ShieldCheck,
   AlertTriangle
 } from 'lucide-react';
@@ -84,13 +85,13 @@ export default function WeatherPage() {
   const c = current;
 
   const renderWeatherIcon = (desc, size = 32) => {
-    if (!desc) return <CloudSun size={size} className="text-amber-400" />;
+    if (!desc) return <CloudSun size={size} className="weather-symbol weather-symbol-default" />;
     const d = desc.toLowerCase();
-    if (d.includes('rain') || d.includes('drizzle')) return <CloudRain size={size} className="text-sky-400" />;
-    if (d.includes('cloud')) return <Cloud size={size} className="text-slate-400" />;
-    if (d.includes('clear') || d.includes('sun')) return <Sun size={size} className="text-amber-400" />;
-    if (d.includes('storm') || d.includes('thunder')) return <CloudLightning size={size} className="text-purple-400" />;
-    return <CloudSun size={size} className="text-amber-400" />;
+    if (d.includes('rain') || d.includes('drizzle')) return <CloudRain size={size} className="weather-symbol weather-symbol-rain" />;
+    if (d.includes('cloud')) return <Cloud size={size} className="weather-symbol weather-symbol-cloud" />;
+    if (d.includes('clear') || d.includes('sun')) return <Sun size={size} className="weather-symbol weather-symbol-sun" />;
+    if (d.includes('storm') || d.includes('thunder')) return <CloudLightning size={size} className="weather-symbol weather-symbol-storm" />;
+    return <CloudSun size={size} className="weather-symbol weather-symbol-default" />;
   };
 
   return (
@@ -101,18 +102,18 @@ export default function WeatherPage() {
           <div>
             <span className="eyebrow">
               <CloudSun size={13} />
-              Climate Intelligence Engine
+              Weather and climate
             </span>
-            <h1 className="page-title">Agro-Meteorological Dashboard</h1>
-            <p className="page-subtitle">Live local observations, 7-day forecast, seasonal telemetry, and cane biomass impact.</p>
+            <h1 className="page-title">Weather outlook</h1>
+            <p className="page-subtitle">Current conditions, a 7-day forecast, seasonal history and crop impact.</p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div className="weather-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {c?.is_demo && <Badge variant="warning" dot>Demo Data Feed</Badge>}
             <button
               className="btn-primary"
               onClick={() => navigate(`/prediction?location=${encodeURIComponent(location)}`)}
             >
-              <Sparkles size={16} />
+              <TrendingUp size={16} />
               <span>Predict Yield with Weather</span>
               <ArrowRight size={14} />
             </button>
@@ -120,12 +121,13 @@ export default function WeatherPage() {
         </div>
 
         {/* Location Search Bar */}
-        <div className="card" style={{ padding: '12px 18px', marginBottom: 24 }}>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        <div className="card weather-location-search" style={{ padding: '12px 18px', marginBottom: 24 }}>
+          <div className="weather-location-search-row" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
             <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center' }}>
               <Search size={18} style={{ position: 'absolute', left: 14, color: 'var(--text-muted)' }} />
               <input
-                placeholder="Enter sugarcane farming district (e.g. Kolhapur, Mandya, Pune, Belagavi)"
+                aria-label="Search weather by district"
+                placeholder="District name, for example Kolhapur"
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && setLocation(input)}
@@ -147,34 +149,25 @@ export default function WeatherPage() {
           <>
             {/* Current Weather Hero */}
             {c && (
-              <div style={{
-                background: 'linear-gradient(135deg, #0c281e 0%, #0e3d2c 50%, #084030 100%)',
-                borderRadius: 18,
-                padding: '28px 32px',
-                color: '#ffffff',
-                marginBottom: 24,
-                boxShadow: '0 16px 36px -8px rgba(12, 40, 30, 0.4)',
-                border: '1px solid rgba(52, 211, 153, 0.25)'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 20 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-                    <div style={{ width: 64, height: 64, borderRadius: 18, background: 'rgba(255, 255, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <section className="weather-current-hero" aria-label={`Current weather for ${c.location}`}>
+                  <div className="weather-current-overview">
+                    <div className="weather-current-icon">
                       {renderWeatherIcon(c.description, 36)}
                     </div>
-                    <div>
-                      <div style={{ fontSize: 44, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.02em', display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                        {c.temperature}°<span style={{ fontSize: 22, fontWeight: 500, color: '#a7f3d0' }}>C</span>
+                    <div className="weather-current-copy">
+                      <div className="weather-current-temperature">
+                        {c.temperature}°<span>C</span>
                       </div>
-                      <div style={{ fontSize: 16, fontWeight: 600, color: '#6ee7b7', margin: '4px 0' }}>
+                      <div className="weather-current-description">
                         {c.description || 'Partly Cloudy'}
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#d1fae5' }}>
+                      <div className="weather-current-location">
                         <MapPin size={13} /> {c.location}
                       </div>
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, minWidth: 320 }}>
+                  <div className="weather-current-metrics">
                     {[
                       { icon: Droplets, label: 'Humidity', value: `${c.humidity}%` },
                       { icon: CloudRain, label: 'Rainfall', value: `${c.rainfall || 0} mm` },
@@ -185,24 +178,23 @@ export default function WeatherPage() {
                     ].map(m => {
                       const MetricIcon = m.icon;
                       return (
-                        <div key={m.label} style={{ background: 'rgba(255, 255, 255, 0.08)', backdropFilter: 'blur(8px)', padding: '10px 14px', borderRadius: 12, border: '1px solid rgba(255, 255, 255, 0.1)' }}>
-                          <MetricIcon size={14} style={{ color: '#6ee7b7', marginBottom: 2 }} />
-                          <div style={{ fontSize: 15, fontWeight: 700, color: '#ffffff' }}>{m.value}</div>
-                          <div style={{ fontSize: 11, color: '#a7f3d0' }}>{m.label}</div>
+                        <div key={m.label} className="weather-current-metric">
+                          <MetricIcon size={15} className="weather-metric-icon" />
+                          <div className="weather-metric-value">{m.value}</div>
+                          <div className="weather-metric-label">{m.label}</div>
                         </div>
                       );
                     })}
                   </div>
-                </div>
-              </div>
+              </section>
             )}
 
             {/* Tab Switcher */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 20, borderBottom: '1px solid var(--border)', paddingBottom: 8 }}>
+            <div className="weather-tabs" role="group" aria-label="Weather views">
               {[
                 { id: 'forecast', label: '7-Day Forecast', icon: Calendar },
                 { id: 'history', label: 'Seasonal Telemetry History', icon: CloudSun },
-                { id: 'impact', label: 'Sugarcane Phenology Impact', icon: Sparkles }
+                { id: 'impact', label: 'Sugarcane Phenology Impact', icon: Activity }
               ].map(t => {
                 const TabIcon = t.icon;
                 const active = tab === t.id;
@@ -211,6 +203,7 @@ export default function WeatherPage() {
                     key={t.id}
                     className={`btn ${active ? 'btn-primary' : 'btn-outline'}`}
                     onClick={() => setTab(t.id)}
+                    aria-pressed={active}
                     style={{ padding: '8px 16px', fontSize: 13 }}
                   >
                     <TabIcon size={15} />
@@ -256,11 +249,15 @@ export default function WeatherPage() {
                 </div>
                 <ResponsiveContainer width="100%" height={260}>
                   <BarChart data={history} margin={{ top: 10, right: 10, bottom: 0, left: -10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(226, 232, 240, 0.6)" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                     <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
                     <YAxis yAxisId="temp" orientation="left" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
                     <YAxis yAxisId="rain" orientation="right" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
-                    <Tooltip contentStyle={{ borderRadius: 10 }} />
+                  <Tooltip
+                    contentStyle={{ borderRadius: 10, borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}
+                    labelStyle={{ color: 'var(--text-primary)' }}
+                    itemStyle={{ color: 'var(--text-secondary)' }}
+                  />
                     <Legend />
                     <Bar yAxisId="temp" dataKey="avg_temp" fill="#f59e0b" name="Avg Temp (°C)" radius={[4, 4, 0, 0]} />
                     <Bar yAxisId="rain" dataKey="total_rainfall" fill="#0ea5e9" name="Precipitation (mm)" radius={[4, 4, 0, 0]} />

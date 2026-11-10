@@ -46,9 +46,9 @@ export default function LoginPage() {
           <span className="auth-rebuilt-tab is-active" aria-current="page">Sign in</span>
           <Link className="auth-rebuilt-tab" to="/signup">Create account <ArrowRight size={14} /></Link>
         </nav>
-        <div className="auth-rebuilt-eyebrow"><Sprout size={15} /> SECURE GROWER ACCESS</div>
-        <h2 id="login-heading">Welcome back</h2>
-        <p className="auth-rebuilt-intro">Sign in to continue to your smart farming dashboard.</p>
+        <div className="auth-rebuilt-eyebrow"><Sprout size={15} /> Grower account</div>
+        <h2 id="login-heading">Sign in</h2>
+        <p className="auth-rebuilt-intro">Open your farm records, field conditions and yield outlook.</p>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className="auth-rebuilt-field">
@@ -71,7 +71,7 @@ export default function LoginPage() {
           <SubmitButton loading={isSubmitting} className="auth-rebuilt-submit" icon={ArrowRight}>Sign in to Dashboard</SubmitButton>
         </form>
 
-        <div className="auth-rebuilt-divider"><span />OR<span /></div>
+        <div className="auth-rebuilt-divider"><span /><span /></div>
         <p className="auth-rebuilt-switch">New to SugarYield AI? <Link to="/signup">Create your account</Link></p>
         <div className="auth-rebuilt-privacy"><ShieldCheck size={15} /> Your account details are handled securely.</div>
       </section>

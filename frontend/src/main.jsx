@@ -8,6 +8,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import './styles.css';
 import './theme-overrides.css';
+import './premium-ux.css';
 
 createRoot(document.getElementById('root')).render(
   <ErrorBoundary>

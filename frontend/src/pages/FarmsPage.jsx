@@ -352,12 +352,12 @@ export default function FarmsPage() {
         {/* Page Header */}
         <div className="page-header farms-page-header" style={{ marginBottom: 24 }}>
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 20, background: 'rgba(16, 185, 129, 0.1)', color: 'var(--primary)', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
-              <Building2 size={13} /> Precision Land Tenure & Parcel Intelligence
+            <div className="farms-page-kicker">
+              <Building2 size={14} /> Farm overview
             </div>
-            <h1 className="page-title" style={{ margin: '0 0 6px' }}>Agricultural Holdings & Fields</h1>
-            <p className="page-subtitle" style={{ margin: 0, color: 'var(--text-secondary)' }}>
-              Configure spatial boundaries, sugarcane varieties, edaphic baseline conditions, and automated phenological growth calendars.
+            <h1 className="page-title" style={{ margin: '0 0 6px' }}>Your farms &amp; fields</h1>
+            <p className="page-subtitle">
+              Manage your farms, field conditions, and sugarcane crop details in one place.
             </p>
           </div>
           <div className="header-actions" style={{ display: 'flex', gap: 10 }}>
@@ -379,53 +379,59 @@ export default function FarmsPage() {
             value={farms.length}
             unit="properties"
             icon={Building2}
-            color="emerald"
-            subtitle="Commercial agricultural units"
+            color="#4b8b61"
+            subtitle="Registered farms"
+            className="farms-stat-card"
           />
           <StatCard
             label="Cumulative Land Area"
             value={totalHoldingsArea.toFixed(1)}
             unit="hectares"
             icon={Layers}
-            color="teal"
-            subtitle="Registered cultivable acreage"
+            color="#548b81"
+            subtitle="Total registered area"
+            className="farms-stat-card"
           />
           <StatCard
             label="Active Monitored Parcels"
             value={totalFieldCount}
             unit="fields"
             icon={Sprout}
-            color="green"
-            subtitle="Configured field subdivisions"
+            color="#648c4b"
+            subtitle="Across all farms"
+            className="farms-stat-card"
           />
           <StatCard
             label="Cultivated Area"
             value={totalCultivatedArea.toFixed(1)}
             unit="hectares"
             icon={Sprout}
-            color="green"
-            subtitle="Sum of registered field areas"
+            color="#7c9650"
+            subtitle="Combined field area"
+            className="farms-stat-card"
           />
           <StatCard
             label="Selected Farm Utilization"
             value={activeFarm && activeFarm.total_area > 0 ? Math.round((activeFieldArea / activeFarm.total_area) * 100) : 0}
             unit="%"
             icon={Activity}
-            color="amber"
+            color="#aa8746"
             trend={activeFieldArea > 0 ? `${activeFieldArea.toFixed(1)} ha planted` : 'Unassigned'}
-            subtitle="Planted vs total holding"
+            subtitle="Of selected farm planted"
+            className="farms-stat-card"
           />
         </div>
 
         {/* Farm Selector Ribbon */}
         {farms.length > 0 && (
           <div className="farm-selector-section" style={{ marginBottom: 24 }}>
-            <div className="farm-selector-heading" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Select Agricultural Estate ({farms.length} Registered)
+            <div className="farm-selector-heading">
+              <span className="farm-selector-title">
+                Choose a farm <span className="farm-selector-count">{farms.length} registered</span>
               </span>
-              <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                Active: <strong style={{ color: 'var(--primary)' }}>{activeFarm?.name || 'None'}</strong>
+              <span className="farm-selector-active">
+                <span>Active farm</span>
+                <strong>{activeFarm?.name || 'None'}</strong>
               </span>
             </div>
             <div className="farm-selector-list" style={{ display: 'flex', alignItems: 'stretch', gap: 12, overflowX: 'auto', paddingBottom: 8 }}>
@@ -435,45 +441,24 @@ export default function FarmsPage() {
                   <button
                     key={f.id}
                     className="farm-selector-card"
+                    aria-pressed={isSelected}
                     onClick={() => { setActiveFarm(f); selectFarm(f.id); }}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-start',
-                      gap: 4,
-                      padding: '12px 16px',
-                      borderRadius: 14,
-                      minWidth: 240,
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                      border: isSelected ? '1.5px solid var(--primary)' : '1px solid var(--border-color)',
-                      background: isSelected ? 'var(--primary-glow)' : 'var(--card-bg)',
-                      boxShadow: isSelected ? '0 4px 12px rgba(16, 185, 129, 0.15)' : 'var(--shadow-sm)',
-                      flexShrink: 0
-                    }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 8 }}>
-                      <strong style={{ fontSize: 13.5, color: isSelected ? 'var(--primary)' : 'var(--text-primary)' }}>
+                    <div className="farm-selector-card-top">
+                      <strong className="farm-selector-name">
                         {f.name}
                       </strong>
-                      <span style={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        padding: '2px 8px',
-                        borderRadius: 20,
-                        background: isSelected ? 'var(--primary)' : 'var(--bg-tertiary)',
-                        color: isSelected ? '#ffffff' : 'var(--text-muted)',
-                        whiteSpace: 'nowrap'
-                      }}>
+                      <span className="farm-selector-field-count">
                         {f.fields?.length || 0} fields
                       </span>
                     </div>
-                    <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
-                      📍 {f.location || 'Rural Region'}{f.district ? ` • ${f.district}` : ''}{f.state ? `, ${f.state}` : ''}
+                    <span className="farm-selector-meta">
+                      <MapPin size={14} aria-hidden="true" />
+                      <span>{f.location || 'Rural Region'}{f.district ? ` · ${f.district}` : ''}{f.state ? `, ${f.state}` : ''}</span>
                     </span>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)' }}>
-                      📐 {Number(f.total_area || 0).toFixed(1)} ha total area
+                    <span className="farm-selector-area">
+                      <Layers size={14} aria-hidden="true" />
+                      <span>{Number(f.total_area || 0).toFixed(1)} ha total area</span>
                     </span>
                   </button>
                 );

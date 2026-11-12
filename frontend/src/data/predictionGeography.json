@@ -1,0 +1,234 @@
+{
+  "states": [
+    {
+      "name": "Uttar Pradesh",
+      "districts": [
+        "Muzaffarnagar",
+        "Meerut",
+        "Bijnor",
+        "Saharanpur",
+        "Bareilly",
+        "Lakhimpur Kheri",
+        "Deoria",
+        "Bulandshahr",
+        "Moradabad",
+        "Gorakhpur",
+        "Gonda",
+        "Basti",
+        "Sultanpur",
+        "Ballia",
+        "Shahjahanpur"
+      ],
+      "varieties": [
+        "Co 0238",
+        "Co 86032"
+      ]
+    },
+    {
+      "name": "Maharashtra",
+      "districts": [
+        "Kolhapur",
+        "Sangli",
+        "Satara",
+        "Ahmednagar",
+        "Pune",
+        "Solapur",
+        "Nashik",
+        "Jalgaon",
+        "Dhule",
+        "Nandurbar",
+        "Aurangabad",
+        "Beed",
+        "Latur",
+        "Osmanabad"
+      ],
+      "varieties": [
+        "Co 86032",
+        "CoM 0265"
+      ]
+    },
+    {
+      "name": "Karnataka",
+      "districts": [
+        "Belagavi",
+        "Bagalkot",
+        "Vijayapura",
+        "Mandya",
+        "Mysuru",
+        "Chamrajanagar",
+        "Shivamogga",
+        "Uttara Kannada",
+        "Bidar",
+        "Raichur",
+        "Bellary",
+        "Davangere",
+        "Chitradurga",
+        "Hassan"
+      ],
+      "varieties": [
+        "Co 86032",
+        "CoM 0265",
+        "Co 94012",
+        "Co 419",
+        "Co 62175"
+      ]
+    },
+    {
+      "name": "Tamil Nadu",
+      "districts": [
+        "Coimbatore",
+        "Erode",
+        "Salem",
+        "Thanjavur",
+        "Tiruchirappalli",
+        "Cuddalore",
+        "Villupuram",
+        "Tiruvannamalai",
+        "Vellore",
+        "Namakkal",
+        "Karur",
+        "Pudukkottai",
+        "Nagapattinam",
+        "Tiruvarur"
+      ],
+      "varieties": [
+        "Co 86032"
+      ]
+    },
+    {
+      "name": "Andhra Pradesh",
+      "districts": [
+        "East Godavari",
+        "West Godavari",
+        "Krishna",
+        "Visakhapatnam",
+        "Guntur",
+        "Prakasam",
+        "Nellore",
+        "Vizianagaram",
+        "Srikakulam",
+        "Chittoor"
+      ],
+      "varieties": [
+        "Co 86032"
+      ]
+    },
+    {
+      "name": "Gujarat",
+      "districts": [
+        "Surat",
+        "Navsari",
+        "Bharuch",
+        "Valsad",
+        "Tapi",
+        "Vadodara",
+        "Kheda",
+        "Anand"
+      ],
+      "varieties": [
+        "Co 99004",
+        "Co 86032"
+      ]
+    },
+    {
+      "name": "Haryana",
+      "districts": [
+        "Yamuna Nagar",
+        "Karnal",
+        "Kurukshetra",
+        "Ambala",
+        "Panipat",
+        "Rohtak"
+      ],
+      "varieties": [
+        "CoC 671",
+        "Co 0238"
+      ]
+    },
+    {
+      "name": "Punjab",
+      "districts": [
+        "Jalandhar",
+        "Gurdaspur",
+        "Amritsar",
+        "Ludhiana",
+        "Patiala",
+        "Sangrur",
+        "Ferozepur"
+      ],
+      "varieties": [
+        "Co 0238",
+        "CoC 671"
+      ]
+    },
+    {
+      "name": "Bihar",
+      "districts": [
+        "Champaran",
+        "Siwan",
+        "Gopalganj",
+        "Muzaffarpur",
+        "Darbhanga",
+        "Samastipur",
+        "Vaishali",
+        "Saran"
+      ],
+      "varieties": [
+        "Co 0238",
+        "Co 86032"
+      ]
+    },
+    {
+      "name": "Telangana",
+      "districts": [
+        "Nizamabad",
+        "Medak",
+        "Karimnagar",
+        "Nalgonda",
+        "Khammam",
+        "Warangal"
+      ],
+      "varieties": [
+        "Co 86032"
+      ]
+    },
+    {
+      "name": "Uttarakhand",
+      "districts": [
+        "Haridwar",
+        "Dehradun",
+        "Udham Singh Nagar"
+      ],
+      "varieties": [
+        "Co 86032",
+        "Co 0238"
+      ]
+    },
+    {
+      "name": "Madhya Pradesh",
+      "districts": [
+        "Narsinghpur",
+        "Betul",
+        "Hoshangabad",
+        "Chhindwara",
+        "Datia"
+      ],
+      "varieties": [
+        "Co 86032"
+      ]
+    },
+    {
+      "name": "West Bengal",
+      "districts": [
+        "Medinipur West",
+        "Murshidabad",
+        "Maldah",
+        "Nadia",
+        "Purba Bardhaman"
+      ],
+      "varieties": [
+        "Co 0238"
+      ]
+    }
+  ]
+}

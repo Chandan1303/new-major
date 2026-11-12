@@ -3426,7 +3426,7 @@ def auth_resend_verification():
 
 # -----------------------------------------------------------------------------
 # 28. GEOGRAPHY & AGRICULTURE DATA APIS
-# GET /api/geography/states - Get all 11 sugarcane-growing states
+# GET /api/geography/states - Get states represented in the geography dataset
 # GET /api/geography/districts?state=<state> - Get districts for a state
 # GET /api/geography/varieties?state=<state> - Get varieties recommended for a state
 # -----------------------------------------------------------------------------
@@ -3456,14 +3456,13 @@ except Exception as e:
 
 @app.route("/api/geography/states", methods=["GET"])
 def get_states():
-    """Get list of 11 major sugarcane-growing states"""
+    """Get all states represented in the geography directory."""
     states = [
         {
             "name": state_obj["state"],
             "district_count": len(state_obj["districts"])
         }
         for state_obj in GEOGRAPHY_DATA
-        if state_obj["state"] in VALID_SUGARCANE_STATES
     ]
     
     return jsonify({
@@ -3533,9 +3532,14 @@ def get_varieties_by_state():
     
     if not varieties:
         return jsonify({
-            "success": False,
-            "message": f"No varieties found for state '{state}'"
-        }), 404
+            "success": True,
+            "data": {
+                "state": state,
+                "varieties": [],
+                "count": 0,
+                "note": "No state-specific trained variety mapping is available."
+            }
+        })
     
     return jsonify({
         "success": True,

@@ -455,7 +455,7 @@ export default function FarmMapPage() {
 
   return (
     <AppLayout>
-      <div className="page-container">
+      <div className="page-container farm-map-page">
         {/* Header */}
         <div className="page-header" style={{ marginBottom: 24 }}>
           <div>
@@ -577,6 +577,7 @@ export default function FarmMapPage() {
               {hasSpatialData ? (
                 <div
                   ref={mapContainerRef}
+                  className="farm-map-canvas"
                   style={{
                     height: 480,
                     width: '100%',

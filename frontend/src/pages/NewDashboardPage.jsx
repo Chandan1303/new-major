@@ -28,7 +28,8 @@ import {
   FileText,
   MessageSquare,
   RefreshCw,
-  BellRing
+  BellRing,
+  Lightbulb
 } from 'lucide-react';
 import AppLayout from '../components/AppLayout';
 import StatCard from '../components/ui/StatCard';
@@ -286,9 +287,9 @@ export default function NewDashboardPage() {
         </div>
 
         {/* MULTI-FARM FILTER TOOLBAR */}
-        <div className="card" style={{ padding: '16px 20px', marginBottom: 24 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div className="card dashboard-filter-card" style={{ padding: '16px 20px', marginBottom: 24 }}>
+          <div className="dashboard-filter-main" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14 }}>
+            <div className="dashboard-filter-intro" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--primary-light)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Filter size={18} />
               </div>
@@ -300,12 +301,12 @@ export default function NewDashboardPage() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <label style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-muted)' }}>Farm:</label>
+            <div className="dashboard-filter-controls" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+              <div className="dashboard-filter-group" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <label htmlFor="dashboard-farm-filter" style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-muted)' }}>Farm</label>
                 <select
-                  className="form-control"
-                  style={{ padding: '7px 12px', fontSize: 13, minWidth: 200 }}
+                  className="form-control dashboard-filter-select"
+                  id="dashboard-farm-filter"
                   value={selectedFarmId}
                   onChange={handleFarmFilterChange}
                 >
@@ -318,11 +319,11 @@ export default function NewDashboardPage() {
                 </select>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <label style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-muted)' }}>Field:</label>
+              <div className="dashboard-filter-group" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <label htmlFor="dashboard-field-filter" style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-muted)' }}>Field</label>
                 <select
-                  className="form-control"
-                  style={{ padding: '7px 12px', fontSize: 13, minWidth: 180 }}
+                  className="form-control dashboard-filter-select"
+                  id="dashboard-field-filter"
                   value={selectedFieldId}
                   onChange={handleFieldFilterChange}
                 >
@@ -354,8 +355,12 @@ export default function NewDashboardPage() {
           </div>
         </div>
 
-        {/* 8 MASTER METRIC CARDS */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginBottom: 24 }}>
+        <section className="dashboard-metric-section" aria-labelledby="farm-overview-heading">
+          <div className="dashboard-section-heading">
+            <div><span>Portfolio</span><h2 id="farm-overview-heading">Farm overview</h2></div>
+            <p>Current coverage across your registered farms and fields</p>
+          </div>
+          <div className="dashboard-metric-grid dashboard-primary-metrics" style={{ marginBottom: 20 }}>
           <StatCard
             icon={Warehouse}
             label="Total Farms"
@@ -390,6 +395,15 @@ export default function NewDashboardPage() {
             subtitle="Forecasted regional tonnage"
             onClick={() => navigate(predictionPath())}
           />
+          </div>
+        </section>
+
+        <section className="dashboard-metric-section dashboard-outlook-section" aria-labelledby="crop-outlook-heading">
+          <div className="dashboard-section-heading">
+            <div><span>Crop signals</span><h2 id="crop-outlook-heading">Yield and field status</h2></div>
+            <p>Forecasts and current assessments recorded for your fields</p>
+          </div>
+          <div className="dashboard-metric-grid dashboard-status-metrics" style={{ marginBottom: 24 }}>
           <StatCard
             icon={Sprout}
             label="Avg Predicted Yield"
@@ -424,7 +438,8 @@ export default function NewDashboardPage() {
             subtitle={calculatedMetrics.highRisk > 0 ? 'Urgent attention required' : calculatedMetrics.normalFields > 0 ? 'Current high-risk assessments' : 'No high-risk assessments recorded'}
             onClick={() => navigate('/yield-loss')}
           />
-        </div>
+          </div>
+        </section>
 
         {/* IRRIGATION DECISION SUPPORT BANNER */}
         {irrigation && (
@@ -473,7 +488,7 @@ export default function NewDashboardPage() {
         )}
 
         {/* AI FARM ADVISOR & DIRECTIVES */}
-        <div className="card" style={{ padding: '22px 24px', marginBottom: 24 }}>
+        <div className="card dashboard-advisor-panel" style={{ padding: '22px 24px', marginBottom: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--primary-light)', color: 'var(--primary-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -489,7 +504,7 @@ export default function NewDashboardPage() {
             <Badge variant="success" dot>Grounded in Telemetry</Badge>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 14 }}>
+          <div className="dashboard-advisor-grid">
             {advisorData.length === 0 ? (
               <div style={{ gridColumn: '1 / -1', padding: '24px', background: 'var(--border-subtle)', borderRadius: 12, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13.5 }}>
                 <ShieldCheck size={28} style={{ color: '#10b981', margin: '0 auto 8px', display: 'block' }} />
@@ -520,22 +535,22 @@ export default function NewDashboardPage() {
                   </div>
 
                   <div style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>
-                    <strong style={{ color: 'var(--primary)', display: 'block', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 2 }}>
-                      📍 Current Situation:
+                    <strong style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 2 }}>
+                      <MapPin size={13} aria-hidden="true" /> Current Situation
                     </strong>
                     {item.current_situation || item.message || item.content}
                   </div>
 
                   <div style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>
-                    <strong style={{ color: '#0ea5e9', display: 'block', fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 2 }}>
-                      📋 Suggested Action:
+                    <strong style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 2 }}>
+                      <FileText size={13} aria-hidden="true" /> Suggested Action
                     </strong>
                     {item.suggested_monitoring_actions || item.action_required || item.message}
                   </div>
 
                   <div style={{ background: 'var(--border-subtle)', padding: '8px 12px', borderRadius: 8, fontSize: 11.5, color: 'var(--text-muted)' }}>
-                    <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: 2 }}>
-                      💡 Reason:
+                    <strong style={{ color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                      <Lightbulb size={13} aria-hidden="true" /> Reason
                     </strong>
                     {item.why_generated || item.explanation || 'Triggered by soil moisture and crop phenology thresholds.'}
                   </div>
@@ -546,11 +561,11 @@ export default function NewDashboardPage() {
         </div>
 
         {/* TWO COLUMN CHARTS & ALERTS */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 20, marginBottom: 24 }}>
+        <div className="dashboard-insight-grid" style={{ marginBottom: 24 }}>
           {/* Yield Trend Area Chart */}
           <div className="card multi-season-yield-panel" style={{ padding: '22px 24px' }}>
-            <div className="multi-season-yield-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div>
+            <div className="multi-season-yield-header dashboard-chart-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div className="dashboard-chart-title">
                 <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700 }}>Multi-Season Yield Telemetry</h3>
                 <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Stored predictions; actual yield and benchmarks appear only when recorded</span>
               </div>
@@ -594,8 +609,8 @@ export default function NewDashboardPage() {
           </div>
 
           {/* Active Alerts */}
-          <div className="card" style={{ padding: '22px 24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div className="card dashboard-alerts-panel" style={{ padding: '22px 24px' }}>
+            <div className="dashboard-alerts-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <BellRing size={16} className="text-amber-500" />
                 <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700 }}>Active Agro-Climatic Alerts</h3>
@@ -643,11 +658,11 @@ export default function NewDashboardPage() {
         </div>
 
         {/* QUICK ACTIONS BAR */}
-        <div className="card" style={{ padding: '16px 20px' }}>
+        <div className="card dashboard-quick-tools" style={{ padding: '16px 20px' }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 12 }}>
             Farm tools
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10 }}>
+          <div className="dashboard-quick-tools-grid">
             {[
               { icon: Warehouse, label: 'Register Farm', path: '/farms' },
               { icon: Sprout, label: 'Add Field', path: '/farms' },

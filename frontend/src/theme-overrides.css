@@ -663,10 +663,10 @@ html[data-theme="dark"] .app-main :is(p, label, legend, small, li, dt, dd, th, t
   color: var(--text-secondary) !important;
 }
 html[data-theme="dark"] .app-main :is(strong, b) { color: var(--text-primary) !important; }
-html[data-theme="dark"] .app-main span:not([class]):not([style*="background"]) {
+html[data-theme="dark"] .app-main span:not([class]):not([style*="background"]):not(button span):not([role="button"] span):not(.btn span):not(.btn-primary span):not(.btn-secondary span):not(.btn-outline span):not(.btn-outline-sm span):not(.btn-predict span):not(.submit span):not(.ci-primary span):not(.btn-success span):not(.btn-danger span):not(.icon-button span) {
   color: var(--text-secondary) !important;
 }
-html[data-theme="dark"] .app-main span[class]:not([class*="badge"]):not([class*="status"]):not([class*="severity"]):not([class*="risk"]):not([class*="dot"]):not([class*="icon"]):not([class*="pill"]):not([class*="tag"]) {
+html[data-theme="dark"] .app-main span[class]:not([class*="badge"]):not([class*="status"]):not([class*="severity"]):not([class*="risk"]):not([class*="dot"]):not([class*="icon"]):not([class*="pill"]):not([class*="tag"]):not(button span):not([role="button"] span):not(.btn span):not(.btn-primary span):not(.btn-secondary span):not(.btn-outline span):not(.btn-outline-sm span):not(.btn-predict span):not(.submit span):not(.ci-primary span):not(.btn-success span):not(.btn-danger span):not(.icon-button span) {
   color: var(--text-secondary) !important;
 }
 html[data-theme="dark"] .app-main :is(a, .link, .text-link) { color: #6ee7b7; }
@@ -3058,6 +3058,43 @@ html[data-theme="dark"] .auth-shell .form-content.auth-card input[type="text"]:-
   }
 }
 
+html[data-theme="dark"] .farm-reports-page .report-document {
+  color: var(--text-primary) !important;
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+
+html[data-theme="dark"] .farm-reports-page .report-document-section,
+html[data-theme="dark"] .farm-reports-page .report-document-recommendations {
+  color: var(--text-secondary);
+  background: var(--bg-secondary) !important;
+  border-color: var(--border) !important;
+}
+
+html[data-theme="dark"] .farm-reports-page .report-executive-summary {
+  color: var(--text-primary);
+  background: rgba(47, 120, 80, .16) !important;
+  border-color: rgba(126, 197, 151, .45) !important;
+}
+
+html[data-theme="dark"] .farm-reports-page .report-document :is(h2, h4, strong) {
+  color: var(--text-primary) !important;
+}
+
+html[data-theme="dark"] .farm-reports-page .report-document :is(p, li) {
+  color: var(--text-secondary) !important;
+}
+
+html[data-theme="dark"] .farm-reports-page .report-document .sc-label,
+html[data-theme="dark"] .farm-reports-page .report-document .sc-subtitle {
+  color: var(--text-secondary) !important;
+}
+
+html[data-theme="dark"] .farm-reports-page .report-document .sc-value,
+html[data-theme="dark"] .farm-reports-page .report-document .sc-unit {
+  color: var(--text-primary) !important;
+}
+
 /* Farm holdings and field parcels: compact, touch-friendly phone layout. */
 @media (max-width: 680px) {
   .farms-page { padding-top: 16px !important; }
@@ -3209,4 +3246,357 @@ html[data-theme="dark"] .auth-shell .form-content.auth-card input[type="text"]:-
   .soil-health-page .soil-health-summary-grid { grid-template-columns: minmax(0, 1fr) !important; }
   .soil-health-page .soil-health-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   .farm-reports-page .report-document-metrics { grid-template-columns: minmax(0, 1fr) !important; }
+}
+
+/* Focused polish for the existing field dashboard. Keep layout and data flow intact. */
+.farm-dashboard-page {
+  --dashboard-space: clamp(14px, 1.6vw, 22px);
+}
+
+.farm-dashboard-page .dashboard-hero {
+  min-height: 176px;
+  padding: clamp(24px, 3vw, 38px) clamp(24px, 3.2vw, 46px) !important;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(17, 54, 35, .12);
+}
+
+.farm-dashboard-page .dashboard-hero .page-title {
+  font-size: clamp(30px, 3vw, 38px);
+  line-height: 1.12;
+  letter-spacing: -.035em;
+}
+
+.farm-dashboard-page .dashboard-hero .page-subtitle {
+  max-width: 54ch;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.farm-dashboard-page .dashboard-hero .header-actions > :is(button, a) {
+  min-height: 46px;
+  padding-inline: 16px;
+  border-radius: 11px;
+  font-weight: 600;
+  transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease;
+}
+
+.farm-dashboard-page .dashboard-filter-card,
+.farm-dashboard-page .dashboard-advisor-panel,
+.farm-dashboard-page .dashboard-insight-grid > .card,
+.farm-dashboard-page .dashboard-alerts-panel,
+.farm-dashboard-page .dashboard-quick-tools {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+}
+
+.farm-dashboard-page .dashboard-filter-card { padding: 18px 20px !important; }
+.farm-dashboard-page .dashboard-filter-main { gap: 18px; }
+.farm-dashboard-page .dashboard-filter-intro strong { font-size: 14px !important; letter-spacing: -.01em; }
+.farm-dashboard-page .dashboard-filter-intro span { margin-top: 3px; color: var(--text-secondary) !important; font-size: 12.5px !important; line-height: 1.45; }
+.farm-dashboard-page .dashboard-filter-controls { gap: 10px !important; }
+.farm-dashboard-page .dashboard-filter-group { gap: 8px !important; }
+.farm-dashboard-page .dashboard-filter-group label { color: var(--text-secondary) !important; font-size: 12px !important; }
+.farm-dashboard-page .dashboard-filter-select {
+  width: clamp(190px, 19vw, 260px);
+  min-height: 42px;
+  padding: 8px 34px 8px 12px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  background-color: var(--bg-panel) !important;
+  color: var(--text-primary) !important;
+  font-size: 13px !important;
+}
+
+.farm-dashboard-page .dashboard-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.farm-dashboard-page .dashboard-metric-grid .stat-card {
+  min-width: 0;
+  min-height: 142px;
+  border-radius: 16px;
+  transition: transform 170ms ease, box-shadow 170ms ease, border-color 170ms ease;
+}
+.farm-dashboard-page .dashboard-metric-grid .stat-card :is(.sc-label, .sc-subtitle) { color: var(--text-secondary) !important; }
+
+.farm-dashboard-page .dashboard-advisor-panel { padding: 22px 24px !important; }
+.farm-dashboard-page .dashboard-advisor-panel > div:first-child { align-items: flex-start !important; }
+.farm-dashboard-page .dashboard-advisor-panel h3 { font-size: 17px !important; letter-spacing: -.015em; }
+.farm-dashboard-page .dashboard-advisor-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.farm-dashboard-page .dashboard-advisor-grid > div {
+  min-width: 0;
+  border-radius: 13px !important;
+  line-height: 1.55;
+}
+
+.farm-dashboard-page .dashboard-insight-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(340px, .8fr);
+  gap: 18px;
+}
+.farm-dashboard-page .dashboard-insight-grid > .card,
+.farm-dashboard-page .dashboard-alerts-panel { min-width: 0; padding: 22px 24px !important; }
+.farm-dashboard-page .dashboard-chart-header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center !important;
+  gap: 12px;
+}
+.farm-dashboard-page .dashboard-chart-title { min-width: 0; }
+.farm-dashboard-page .dashboard-chart-title h3,
+.farm-dashboard-page .dashboard-alerts-header h3 { font-size: 15px !important; line-height: 1.4; letter-spacing: -.01em; }
+.farm-dashboard-page .dashboard-chart-title span { display: block; margin-top: 4px; color: var(--text-secondary) !important; line-height: 1.5; }
+.farm-dashboard-page .dashboard-chart-header > select { min-width: 142px; min-height: 40px; }
+.farm-dashboard-page .dashboard-chart-header > button,
+.farm-dashboard-page .dashboard-alerts-header > button { min-height: 40px; white-space: nowrap; }
+.farm-dashboard-page .dashboard-alerts-panel > div:last-child > div > div > span { color: var(--text-secondary) !important; }
+.farm-dashboard-page .recharts-default-tooltip {
+  border: 1px solid var(--border) !important;
+  border-radius: 11px !important;
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  box-shadow: var(--shadow-md);
+}
+
+.farm-dashboard-page .dashboard-quick-tools { padding: 18px 20px !important; }
+.farm-dashboard-page .dashboard-quick-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+.farm-dashboard-page .dashboard-quick-tools-grid > button {
+  min-width: 0;
+  min-height: 82px;
+  justify-content: center;
+  border-color: var(--border) !important;
+  border-radius: 12px !important;
+  background: var(--bg-panel);
+  color: var(--text-primary) !important;
+  font-size: 12.5px !important;
+  font-weight: 550;
+  transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+.farm-dashboard-page .dashboard-quick-tools-grid > button svg { color: var(--primary) !important; }
+
+.farm-dashboard-page :is(button, a, select, [role="button"]):focus-visible {
+  outline: 3px solid var(--accent);
+  outline-color: color-mix(in srgb, var(--accent) 72%, white);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .farm-dashboard-page .dashboard-hero .header-actions > :is(button, a):hover,
+  .farm-dashboard-page .dashboard-metric-grid .stat-card:hover,
+  .farm-dashboard-page .dashboard-quick-tools-grid > button:hover {
+    transform: translateY(-2px);
+  }
+  .farm-dashboard-page .dashboard-quick-tools-grid > button:hover {
+    border-color: var(--primary) !important;
+    background: var(--bg-secondary);
+  }
+}
+
+@media (max-width: 1180px) {
+  .farm-dashboard-page .dashboard-metric-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .farm-dashboard-page .dashboard-advisor-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .farm-dashboard-page .dashboard-insight-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .farm-dashboard-page .dashboard-quick-tools-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 820px) {
+  .farm-dashboard-page .dashboard-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .farm-dashboard-page .dashboard-insight-grid { grid-template-columns: minmax(0, 1fr); }
+  .farm-dashboard-page .dashboard-advisor-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .farm-dashboard-page .dashboard-quick-tools-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .farm-dashboard-page .dashboard-filter-main { align-items: stretch !important; flex-direction: column; }
+  .farm-dashboard-page .dashboard-filter-controls { width: 100%; }
+  .farm-dashboard-page .dashboard-filter-group { flex: 1 1 220px; }
+  .farm-dashboard-page .dashboard-filter-select { width: 100%; min-width: 0; }
+}
+
+@media (max-width: 600px) {
+  .farm-dashboard-page { padding-inline: 14px; }
+  .farm-dashboard-page .dashboard-hero { min-height: 0; padding: 22px 18px !important; border-radius: 16px; }
+  .farm-dashboard-page .dashboard-hero .page-title { font-size: clamp(27px, 8vw, 34px); }
+  .farm-dashboard-page .dashboard-hero .page-subtitle { font-size: 13px; }
+  .farm-dashboard-page .dashboard-hero .header-actions { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px !important; }
+  .farm-dashboard-page .dashboard-hero .header-actions > :is(button, a) { min-width: 0; padding-inline: 10px; font-size: 12.5px; }
+  .farm-dashboard-page .dashboard-filter-card,
+  .farm-dashboard-page .dashboard-advisor-panel,
+  .farm-dashboard-page .dashboard-insight-grid > .card,
+  .farm-dashboard-page .dashboard-alerts-panel { padding: 16px !important; }
+  .farm-dashboard-page .dashboard-filter-intro > div:last-child { min-width: 0; }
+  .farm-dashboard-page .dashboard-filter-controls { flex-direction: column; align-items: stretch !important; }
+  .farm-dashboard-page .dashboard-filter-group { flex: 1 1 auto; align-items: stretch !important; flex-direction: column; gap: 5px !important; }
+  .farm-dashboard-page .dashboard-filter-select { min-height: 44px; }
+  .farm-dashboard-page .dashboard-filter-controls > button { min-height: 44px; justify-content: center; }
+  .farm-dashboard-page .dashboard-metric-grid { gap: 10px; }
+  .farm-dashboard-page .dashboard-metric-grid .stat-card { min-height: 132px; padding: 14px !important; }
+  .farm-dashboard-page .dashboard-advisor-panel > div:first-child { flex-wrap: wrap; }
+  .farm-dashboard-page .dashboard-advisor-panel > div:first-child > span { margin-left: 46px; }
+  .farm-dashboard-page .dashboard-advisor-grid { grid-template-columns: minmax(0, 1fr); }
+  .farm-dashboard-page .dashboard-chart-header { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; }
+  .farm-dashboard-page .dashboard-chart-title { grid-column: 1 / -1; }
+  .farm-dashboard-page .dashboard-chart-header > select,
+  .farm-dashboard-page .dashboard-chart-header > button { width: 100%; min-width: 0; min-height: 44px; }
+  .farm-dashboard-page .dashboard-alerts-header { align-items: flex-start !important; gap: 10px; }
+  .farm-dashboard-page .dashboard-alerts-header > button { min-height: 44px; }
+  .farm-dashboard-page .dashboard-alerts-header > div { min-width: 0; }
+  .farm-dashboard-page .dashboard-alerts-header h3 { font-size: 14px !important; }
+  .farm-dashboard-page .dashboard-quick-tools { padding: 15px !important; }
+  .farm-dashboard-page .dashboard-quick-tools-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .farm-dashboard-page .dashboard-quick-tools-grid > button { min-height: 74px; padding: 9px !important; }
+}
+
+@media (max-width: 360px) {
+  .farm-dashboard-page .dashboard-metric-grid { grid-template-columns: minmax(0, 1fr); }
+  .farm-dashboard-page .dashboard-hero .header-actions { grid-template-columns: minmax(0, 1fr); }
+  .farm-dashboard-page .dashboard-chart-header { grid-template-columns: minmax(0, 1fr) !important; }
+  .farm-dashboard-page .dashboard-chart-title { grid-column: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .farm-dashboard-page :is(.dashboard-hero .header-actions > *, .dashboard-metric-grid .stat-card, .dashboard-quick-tools-grid > button) {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}
+
+/* Shared finish for the rest of the existing app and public account pages. */
+html { text-size-adjust: 100%; -webkit-text-size-adjust: 100%; }
+body { overflow-x: clip; }
+.app-shell, .app-main, .app-content { min-width: 0; }
+.app-content { width: 100%; }
+.app-main .page-container { min-width: 0; }
+.app-main .page-header:not(.dashboard-hero) {
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: clamp(12px, 2vw, 20px);
+}
+.app-main .page-header:not(.dashboard-hero) > :first-child { min-width: 0; }
+.app-main .page-header:not(.dashboard-hero) .header-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.app-main .page-title { text-wrap: balance; overflow-wrap: anywhere; }
+.app-main :is(.card, .dash-panel, .dash-card, .chart-card, .summary-card, .stat-card, .farm-card, .field-card, .report-card, .profile-card, .alert-card, .soil-card, .variety-card, .guide-list-panel, .guide-detail-panel, .ci-panel, .ci-stage-card) { min-width: 0; }
+.app-main :is(.card, .dash-panel, .chart-card) :is(h2, h3, h4) { line-height: 1.35; text-wrap: balance; }
+.app-main :is(.table-wrap, .table-responsive, .data-table-wrap, .ci-table-wrap, .ndvi-classification-table-wrap, .yield-variance-table-scroll, .prediction-history-table-scroll) {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.app-main .recharts-responsive-container { min-width: 0; max-width: 100%; }
+.app-main :is(.btn, .btn-primary, .btn-secondary, .btn-outline, .btn-predict, .submit, .icon-button, .topbar-menu-btn, .topbar-icon-btn, .topbar-user) {
+  touch-action: manipulation;
+  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+.app-main :is(.topbar-menu-btn, .topbar-icon-btn, .topbar-user) { min-width: 42px; min-height: 42px; }
+.app-main .sidebar-link { min-height: 44px; }
+.app-main :is(button, a, input, select, textarea, [role="button"]):focus-visible,
+.auth-rebuilt-shell :is(button, a, input, select, textarea):focus-visible,
+.public-legal-page :is(button, a):focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+.app-main :is(button:disabled, input:disabled, select:disabled, textarea:disabled),
+.auth-rebuilt-shell :is(button:disabled, input:disabled, select:disabled, textarea:disabled) { cursor: not-allowed; }
+.app-main :is(button:disabled, input:disabled, select:disabled, textarea:disabled) { opacity: .68; }
+
+.auth-rebuilt-shell {
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow-x: clip;
+  color: var(--text-primary);
+  background: var(--bg-main) !important;
+}
+.auth-rebuilt-hero { min-width: 0; background-position: center; background-size: cover; }
+.auth-rebuilt-main { min-width: 0; color: var(--text-primary); background: var(--bg-main) !important; }
+.auth-rebuilt-card-wrap { width: min(100%, 520px); min-width: 0; }
+.auth-rebuilt-card {
+  width: 100%;
+  padding: clamp(22px, 3vw, 34px);
+  border: 1px solid var(--border) !important;
+  border-radius: 16px;
+  color: var(--text-primary);
+  background: var(--bg-card) !important;
+  box-shadow: var(--shadow-md);
+}
+.auth-rebuilt-card :is(input, select, textarea, .auth-input) { min-height: 48px; font-size: 16px; }
+.auth-rebuilt-card :is(.auth-rebuilt-submit, .auth-rebuilt-aux-primary) { min-height: 48px; }
+.auth-rebuilt-card :is(.auth-rebuilt-tab, .auth-rebuilt-secondary-link, .auth-rebuilt-switch a) { text-underline-offset: 3px; }
+.auth-rebuilt-card .auth-rebuilt-intro { max-width: 52ch; line-height: 1.65; }
+.auth-mode-toggle { min-height: 44px; }
+
+.public-legal-page { min-height: 100vh; min-height: 100svh; overflow-x: clip; }
+.public-legal-main { width: min(100% - 40px, 1000px); }
+.legal-policy-card { border-radius: 16px; }
+.public-legal-topbar :is(a, button), .legal-page-footer a { transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease; }
+
+@media (max-width: 900px) {
+  .app-main .page-header:not(.dashboard-hero) { align-items: flex-start; }
+  .app-main .page-header:not(.dashboard-hero) .header-actions { width: 100%; }
+  .app-main .page-header:not(.dashboard-hero) .header-actions > :is(button, a) { min-height: 44px; }
+}
+
+@media (max-width: 680px) {
+  .app-main .page-header:not(.dashboard-hero) { gap: 10px; margin-bottom: 20px; }
+  .app-main .page-header:not(.dashboard-hero) .header-actions > :is(button, a) { flex: 1 1 145px; min-width: 0; }
+  .app-main :is(.table-wrap, .table-responsive, .data-table-wrap, .ci-table-wrap, .ndvi-classification-table-wrap, .yield-variance-table-scroll, .prediction-history-table-scroll) { margin-inline: 0; }
+  .auth-rebuilt-shell { padding: 0; }
+  .auth-rebuilt-main { width: 100%; padding: max(14px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom)); }
+  .auth-rebuilt-card-wrap { max-width: 500px; margin: 0 auto; }
+  .auth-rebuilt-card { padding: 22px 18px; border-radius: 14px; }
+  .auth-rebuilt-card h2 { font-size: clamp(26px, 7vw, 32px); }
+  .auth-mode-toggle { min-width: 44px; }
+  .public-legal-topbar { padding-inline: 14px; }
+  .public-legal-main { width: calc(100% - 28px); }
+  .public-legal-topbar nav { gap: 8px; }
+  .public-legal-topbar nav a { min-height: 40px; display: inline-flex; align-items: center; }
+  .legal-page-footer { gap: 12px; }
+}
+
+@media (max-width: 400px) {
+  .auth-rebuilt-main { padding-inline: 12px; }
+  .auth-rebuilt-card { padding: 20px 15px; }
+  .auth-rebuilt-tabs { gap: 4px; }
+  .auth-rebuilt-tab { padding-inline: 9px; font-size: 12px; }
+  .public-legal-topbar { gap: 8px; }
+  .public-legal-topbar nav { gap: 5px; }
+  .public-legal-topbar nav a { font-size: 11px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell *, .app-shell *::before, .app-shell *::after,
+  .auth-rebuilt-shell *, .auth-rebuilt-shell *::before, .auth-rebuilt-shell *::after,
+  .public-legal-page *, .public-legal-page *::before, .public-legal-page *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* Keep the profile initial readable against its avatar in either theme. */
+html[data-theme="light"] .topbar-user {
+  background: #075b3d !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+html[data-theme="dark"] .topbar-user {
+  background: #28704c !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+html[data-theme] .topbar-user > span {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }

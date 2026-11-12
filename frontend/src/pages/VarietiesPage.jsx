@@ -225,7 +225,7 @@ export default function VarietiesPage() {
 
             {/* Selected Cultivar Full Profile Drawer/Panel */}
             {detail && (
-              <div className="dash-panel" style={{ marginTop: 24, borderTop: `4px solid ${getColor(detail.variety_code || detail.code || 'Co 86032')}` }}>
+              <div className="dash-panel variety-detail-profile" style={{ marginTop: 24, borderTop: `4px solid ${getColor(detail.variety_code || detail.code || 'Co 86032')}` }}>
                 <div className="dash-panel-header">
                   <h3 style={{ color: getColor(detail.variety_code || detail.code || 'Co 86032'), margin: 0 }}>
                     {detail.name} — Agronomic Profile & Characteristics
@@ -241,7 +241,7 @@ export default function VarietiesPage() {
                   </div>
                 </div>
 
-                <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.6, marginBottom: 20 }}>
+                <p className="variety-detail-description">
                   {detail.description}
                 </p>
 
@@ -388,12 +388,12 @@ export default function VarietiesPage() {
                   </div>
 
                   {comparison.recommended && (
-                    <div className="variety-forecast-row" style={{ marginTop: 16, padding: '14px 18px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div className="variety-forecast-row">
                       <div>
-                        <strong style={{ color: '#166534', fontSize: 14 }}>
+                        <strong className="variety-forecast-title">
                           🏆 Highest Potential Yield: {comparison.recommended}
                         </strong>
-                        <p style={{ margin: '2px 0 0', fontSize: 12, color: '#15803d' }}>
+                        <p className="variety-forecast-description">
                           Provides optimal expected yield under favorable agronomic conditions.
                         </p>
                       </div>

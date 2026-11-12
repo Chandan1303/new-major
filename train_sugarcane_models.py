@@ -49,7 +49,7 @@ ML_RESULTS_DIR = ROOT_DIR / "ml_results"
 ML_RESULTS_DIR.mkdir(exist_ok=True)
 
 print("🌱 Step 1: Loading raw sugarcane dataset...")
-raw_path = ROOT_DIR / "final_dataset" / "SUGARCANE_COMPLETE_ML_DATASET.csv"
+raw_path = ROOT_DIR / "final_dataset" / "Last Final dataset.csv"
 if not raw_path.exists():
     raise FileNotFoundError(f"Source dataset not found at {raw_path}")
 
@@ -104,6 +104,11 @@ for idx, r in df_raw.iterrows():
     state = str(r.get("state", "Maharashtra")).strip()
     if pd.isna(state) or not state or state.lower() == "nan":
         state = "Maharashtra"
+
+    # Keep the source district so the model learns the dataset's full location coverage.
+    district = str(r.get("district", "")).strip()
+    if not district or district.lower() == "nan":
+        district = "Unknown"
 
     # Area
     area = r.get("area_hectare")
@@ -168,6 +173,7 @@ for idx, r in df_raw.iterrows():
 
     clean_rows.append({
         "state": state,
+        "district": district,
         "variety": variety,
         "area_hectare": area,
         "soil_type": soil_type,
@@ -189,7 +195,7 @@ print(f"   Saved clean agronomic dataset to {clean_dataset_path.name}")
 
 print("\n⚙️  Step 3: Encoding categorical features...")
 encoders = {}
-categorical_cols = ["state", "variety", "soil_type", "growth_stage"]
+categorical_cols = ["state", "district", "variety", "soil_type", "growth_stage"]
 
 df_encoded = df_clean.copy()
 for col in categorical_cols:
@@ -210,7 +216,8 @@ feature_cols = [
     "variety_encoded",
     "soil_type_encoded",
     "growth_stage_encoded",
-    "state_encoded"
+    "state_encoded",
+    "district_encoded"
 ]
 
 X = df_encoded[feature_cols]

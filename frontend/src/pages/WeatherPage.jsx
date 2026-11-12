@@ -96,7 +96,7 @@ export default function WeatherPage() {
 
   return (
     <AppLayout>
-      <div className="page-container">
+      <div className="page-container weather-page">
         {/* Header */}
         <div className="page-header" style={{ marginBottom: 24 }}>
           <div>

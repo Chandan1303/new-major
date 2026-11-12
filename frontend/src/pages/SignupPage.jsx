@@ -59,7 +59,7 @@ export default function SignupPage() {
   };
 
   return (
-    <AuthLayout variant="modern">
+    <AuthLayout variant="modern" page="signup">
       <section className={`auth-rebuilt-card auth-rebuilt-signup ${registrationSuccess ? 'auth-rebuilt-success' : ''}`} aria-labelledby="signup-heading">
         {registrationSuccess ? (
           <div className="auth-rebuilt-success-content">

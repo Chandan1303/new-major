@@ -158,5 +158,25 @@
       "Dehradun",
       "Udham Singh Nagar"
     ]
+  },
+  {
+    "state": "Madhya Pradesh",
+    "districts": [
+      "Narsinghpur",
+      "Betul",
+      "Hoshangabad",
+      "Chhindwara",
+      "Datia"
+    ]
+  },
+  {
+    "state": "West Bengal",
+    "districts": [
+      "Medinipur West",
+      "Murshidabad",
+      "Maldah",
+      "Nadia",
+      "Purba Bardhaman"
+    ]
   }
 ]

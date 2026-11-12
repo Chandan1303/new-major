@@ -16,7 +16,7 @@ import Brand from '../components/Brand';
 import brandLogo from '../assets/logo.png';
 import { useTheme } from '../context/ThemeContext';
 
-export default function AuthLayout({ children, compact = false, variant = 'legacy' }) {
+export default function AuthLayout({ children, compact = false, variant = 'legacy', page = 'account' }) {
   const { isDark, toggleTheme } = useTheme();
   const [theme, setTheme] = useState(() => {
     try {
@@ -45,22 +45,47 @@ export default function AuthLayout({ children, compact = false, variant = 'legac
 
   if (variant === 'modern') {
     return (
-      <main className="auth-rebuilt-shell">
+      <main className={`auth-rebuilt-shell auth-page-${page} ${page === 'login' || page === 'signup' ? 'auth-page-auth' : ''}`}>
         <aside className="auth-rebuilt-hero">
           <div className="auth-rebuilt-hero-top">
             <Brand />
             <span className="auth-rebuilt-caption">Sugarcane field management</span>
           </div>
           <div className="auth-rebuilt-hero-copy">
-            <div className="auth-rebuilt-pill"><Sprout size={14} /> Sugarcane field intelligence</div>
-            <div className="auth-rebuilt-overline">Field records and yield outlook</div>
-            <h1>Understand each field.<br /><em>Plan the next step.</em></h1>
-            <p>One connected place to explore yield forecasts, review field conditions, and plan your next farming decisions.</p>
-            <div className="auth-rebuilt-feature-heading"><span>Farm tools</span><span className="auth-rebuilt-feature-rule" /></div>
-            <div className="auth-rebuilt-features">
-              <div className="auth-rebuilt-feature"><span className="auth-rebuilt-feature-icon"><TrendingUp size={19} strokeWidth={2.2} /></span><div><strong>Yield forecasting</strong><small>Explore estimates from your farm inputs.</small></div><span className="auth-rebuilt-feature-index">01</span></div>
-              <div className="auth-rebuilt-feature"><span className="auth-rebuilt-feature-icon"><CloudSun size={19} strokeWidth={2.1} /></span><div><strong>Weather and soil insights</strong><small>Review the field information available to you.</small></div><span className="auth-rebuilt-feature-index">02</span></div>
-              <div className="auth-rebuilt-feature"><span className="auth-rebuilt-feature-icon"><Sprout size={19} strokeWidth={2.1} /></span><div><strong>Practical farm decisions</strong><small>Keep records and planning in one place.</small></div><span className="auth-rebuilt-feature-index">03</span></div>
+            <div className="auth-rebuilt-story">
+              <div className="auth-rebuilt-pill"><Sprout size={14} /> Sugarcane field intelligence</div>
+              <div className="auth-rebuilt-overline">Field records and yield outlook</div>
+              <h1>Know each field.<br /><em>Plan the next step.</em></h1>
+              <p>One connected place to explore yield forecasts, review field conditions, and plan your next farming decisions.</p>
+            </div>
+            <div className="auth-rebuilt-toolbox">
+              {(page === 'login' || page === 'signup') && (
+                <div className="auth-field-survey" aria-hidden="true">
+                  <svg viewBox="0 0 320 188" role="presentation">
+                    <defs>
+                      <clipPath id="auth-field-plot-clip">
+                        <path d="M37 34 225 19 284 63 267 153 85 169 29 111Z" />
+                      </clipPath>
+                    </defs>
+                    <path className="survey-contour" d="M7 64C38 5 106 2 152 23s91 7 147-18M-6 88C33 31 94 25 144 47s101 13 171-12M-8 119C31 65 93 54 144 75s107 19 177-12M-4 149c45-47 99-50 150-31s106 21 170-9" />
+                    <path className="survey-boundary" d="M37 34 225 19 284 63 267 153 85 169 29 111Z" />
+                    <g className="survey-rows" clipPath="url(#auth-field-plot-clip)">
+                      <path d="M54 18 105 182M76 17 127 180M98 16 149 178M120 14 171 176M142 12 193 174M164 10 215 172M186 8 237 170M208 6 259 168M230 5 281 166M252 5 303 164M274 8 325 162" />
+                      <path d="M18 72 294 49M17 96 290 73M20 120 286 97M26 144 282 121" />
+                    </g>
+                    <path className="survey-route" d="m45 49 53 24 48-12 57 29 62-6" />
+                    <circle className="survey-pin" cx="98" cy="73" r="4" />
+                    <circle className="survey-pin survey-pin-end" cx="265" cy="84" r="4" />
+                  </svg>
+                  <span>Illustrative field layout</span>
+                </div>
+              )}
+              <div className="auth-rebuilt-feature-heading"><span>Farm tools</span><span className="auth-rebuilt-feature-rule" /></div>
+              <div className="auth-rebuilt-features">
+                <div className="auth-rebuilt-feature"><span className="auth-rebuilt-feature-icon"><TrendingUp size={19} strokeWidth={2.2} /></span><div><strong>Yield forecasting</strong><small>Explore estimates from your farm inputs.</small></div></div>
+                <div className="auth-rebuilt-feature"><span className="auth-rebuilt-feature-icon"><CloudSun size={19} strokeWidth={2.1} /></span><div><strong>Weather and soil insights</strong><small>Review the field information available to you.</small></div></div>
+                <div className="auth-rebuilt-feature"><span className="auth-rebuilt-feature-icon"><Sprout size={19} strokeWidth={2.1} /></span><div><strong>Practical farm decisions</strong><small>Keep records and planning in one place.</small></div></div>
+              </div>
             </div>
           </div>
           <footer className="auth-rebuilt-hero-footer"><span><Sprout size={14} /> SugarYield AI <i /> Sugarcane decision support</span><span><ShieldCheck size={13} /> Farmer-centred design</span></footer>

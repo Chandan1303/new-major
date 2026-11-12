@@ -3,6 +3,12 @@ export const NDVI_PERIOD = {
   end_date: '2026-07-31',
 };
 
+// All supplied district NDVI values use the shared 1 January–31 July 2026 period.
+export const NDVI_STATE_PERIODS = {
+  'Madhya Pradesh': { ...NDVI_PERIOD, satellite: 'Sentinel-2' },
+  'West Bengal': { ...NDVI_PERIOD },
+};
+
 // The page uses these supplied district means directly; it does not request NDVI from an API.
 export const NDVI_DATA = {
   Karnataka: [
@@ -106,6 +112,21 @@ export const NDVI_DATA = {
     { district: 'East Godavari', ndvi: 0.4927781276 },
     { district: 'Guntur', ndvi: 0.3735266805 },
     { district: 'Krishna', ndvi: 0.3581085568 },
+  ],
+  'Madhya Pradesh': [
+    { district: 'Betul', ndvi: 0.2708575137 },
+    { district: 'Chhindwara', ndvi: 0.2815491759 },
+    { district: 'Datia', ndvi: 0.2678414825 },
+    { district: 'Hoshangabad', ndvi: 0.4700620145 },
+    // “Narshimapura” in the supplied table matches the project district Narsinghpur.
+    { district: 'Narsinghpur', ndvi: 0.4233364294, source_district: 'Narshimapura' },
+  ],
+  'West Bengal': [
+    { district: 'Medinipur West', ndvi: 0.4623767045, ndvi_max: 0.7999810576, ndvi_min: -0.3913043439, source_district: 'Paschim Medinipur' },
+    { district: 'Purba Bardhaman', ndvi: 0.4187747741, ndvi_max: 0.7869933844, ndvi_min: -0.6947674155, source_district: 'Purba Barddhaman' },
+    { district: 'Maldah', ndvi: 0.4924113709, ndvi_max: 0.8481948376, ndvi_min: -0.4391858578 },
+    { district: 'Murshidabad', ndvi: 0.4874913239, ndvi_max: 0.7983392477, ndvi_min: -0.6302816868 },
+    { district: 'Nadia', ndvi: 0.5557572952, ndvi_max: 0.7978921533, ndvi_min: -0.597522378 },
   ],
 };
 

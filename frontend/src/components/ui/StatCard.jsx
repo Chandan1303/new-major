@@ -38,6 +38,15 @@ export default function StatCard({
     <div
       className={`stat-card ${onClick ? 'stat-card-clickable' : ''} ${className}`}
       onClick={onClick}
+      onKeyDown={onClick ? (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick(event);
+        }
+      } : undefined}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      aria-label={onClick ? `${label}: ${value ?? '—'}${unit ? ` ${unit}` : ''}${subtitle ? `. ${subtitle}` : ''}` : undefined}
       style={{ '--card-accent': color }}
     >
       <div className="sc-top">

@@ -59,7 +59,7 @@ def encode_input(raw: dict) -> pd.DataFrame:
         "crop_duration_days": 360, "irrigation_frequency": 3,
         "prev_year_yield": 70, "yield_3yr_avg": 70, "yield_5yr_avg": 70,
         "area_hectare": 1, "variety": "Co 86032",
-        "state": "Karnataka", "season": "Annual"
+        "state": "Karnataka", "district": "Unknown", "season": "Annual"
     }
     row = {**defaults, **raw}
 

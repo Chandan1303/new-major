@@ -44,8 +44,9 @@ import Badge from '../components/ui/Badge';
 import SimulatorPage from './SimulatorPage';
 import { useAuth } from '../context/AuthContext';
 import { useField } from '../context/FieldContext';
-import { mlApi, predictionApi, farmApi, weatherApi, irrigationApi, soilApi, varietyApi, geographyApi, request } from '../services/api';
+import { mlApi, predictionApi, farmApi, weatherApi, irrigationApi, soilApi, varietyApi, request } from '../services/api';
 import { classifyMeanNdvi, formatMeanNdvi, getDistrictNdvi, NDVI_PERIOD } from '../data/ndviDistrictData';
+import predictionGeography from '../data/predictionGeography.json';
 import toast, { Toaster } from 'react-hot-toast';
 // Static constants
 const SOIL_TYPES = ['Black Soil', 'Alluvial Soil', 'Red Loam', 'Clay Loam', 'Sandy Loam'];
@@ -390,77 +391,34 @@ export default function PredictionPage() {
     }
   };
 
-  // Load states on mount
+  // Use the prepared geography list so stale API processes cannot reintroduce removed states.
   useEffect(() => {
-    const loadStates = async () => {
-      try {
-        const data = await geographyApi.getStates();
-        if (data.success) {
-          setStates(data.data.states.map(s => s.name));
-        }
-      } catch (error) {
-        console.error('Failed to load states:', error);
-        // Fallback to hardcoded states
-        setStates(['Maharashtra', 'Karnataka', 'Tamil Nadu', 'Uttar Pradesh', 'Gujarat',
-          'Andhra Pradesh', 'Bihar', 'Punjab', 'Haryana', 'Telangana', 'Uttarakhand']);
-      }
-    };
-    loadStates();
+    setStates(predictionGeography.states.map(state => state.name));
   }, []);
 
   // Load districts when state changes
   useEffect(() => {
-    const loadDistricts = async () => {
-      if (!formData.state) return;
-      
-      setLoadingGeography(true);
-      try {
-        const data = await geographyApi.getDistricts(formData.state);
-        if (data.success) {
-          setDistricts(data.data.districts);
-          // Auto-select first district if current district is not in list
-          if (data.data.districts.length > 0 && !data.data.districts.includes(formData.district)) {
-            setFormData(prev => ({
-              ...prev,
-              district: data.data.districts[0],
-              location: `${data.data.districts[0]}, ${prev.state}`
-            }));
-          }
-        }
-      } catch (error) {
-        console.error('Failed to load districts:', error);
-        setDistricts([]);
-      } finally {
-        setLoadingGeography(false);
-      }
-    };
-    loadDistricts();
+    const stateData = predictionGeography.states.find(state => state.name === formData.state);
+    const nextDistricts = stateData?.districts || [];
+    setDistricts(nextDistricts);
+    setLoadingGeography(false);
+    if (nextDistricts.length > 0 && !nextDistricts.includes(formData.district)) {
+      setFormData(prev => ({
+        ...prev,
+        district: nextDistricts[0],
+        location: `${nextDistricts[0]}, ${prev.state}`
+      }));
+    }
   }, [formData.state]);
 
   // Load varieties when state changes
   useEffect(() => {
-    const loadVarieties = async () => {
-      if (!formData.state) return;
-      
-      try {
-        const data = await geographyApi.getVarieties(formData.state);
-        if (data.success) {
-          setVarieties(data.data.varieties);
-          // Auto-select first variety if current variety is not in list
-          if (data.data.varieties.length > 0 && !data.data.varieties.includes(formData.variety)) {
-            setFormData(prev => ({
-              ...prev,
-              variety: data.data.varieties[0]
-            }));
-          }
-        }
-      } catch (error) {
-        console.error('Failed to load varieties:', error);
-        // Fallback to common varieties
-        setVarieties(['Co 86032', 'Co 0238', 'CoC 671', 'Co 99004', 'CoM 0265']);
-      }
-    };
-    loadVarieties();
+    const stateData = predictionGeography.states.find(state => state.name === formData.state);
+    const nextVarieties = stateData?.varieties || [];
+    setVarieties(nextVarieties);
+    if (!nextVarieties.includes(formData.variety)) {
+      setFormData(prev => ({ ...prev, variety: nextVarieties[0] || '' }));
+    }
   }, [formData.state]);
 
   // Load farms & fields for autofill + parse URL search params
@@ -843,7 +801,7 @@ export default function PredictionPage() {
               <div className="card" style={{ padding: '24px 26px', marginBottom: 24 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
                   <div>
-                    <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>Agronomic Input Parameters (11 Multi-Sensor Factors)</h3>
+                    <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>Agronomic Input Parameters</h3>
                     <p style={{ margin: '3px 0 0', fontSize: 12.5, color: 'var(--text-muted)' }}>
                       Both models evaluate these inputs. Random Forest (lower validation RMSE) supplies the final result; XGBoost remains a comparison.
                     </p>
@@ -889,7 +847,7 @@ export default function PredictionPage() {
                       )}
                     </select>
                     <small style={{ color: 'var(--text-muted)', fontSize: 11.5, marginTop: 4, display: 'block' }}>
-                      11 major sugarcane-growing states
+                      {states.length} supported states
                     </small>
                   </div>
 
@@ -924,7 +882,7 @@ export default function PredictionPage() {
                       )}
                     </select>
                     <small style={{ color: 'var(--text-muted)', fontSize: 11.5, marginTop: 4, display: 'block' }}>
-                      {districts.length} districts with sugarcane cultivation
+                      {districts.length} districts in the training dataset
                     </small>
                   </div>
 
@@ -942,7 +900,7 @@ export default function PredictionPage() {
                       disabled={varieties.length === 0}
                     >
                       {varieties.length === 0 ? (
-                        <option>Loading varieties...</option>
+                        <option value="">No verified variety mapping for this state</option>
                       ) : (
                         varieties.map(v => (
                           <option key={v} value={v}>{v}</option>
@@ -950,7 +908,9 @@ export default function PredictionPage() {
                       )}
                     </select>
                     <small style={{ color: 'var(--text-muted)', fontSize: 11.5, marginTop: 4, display: 'block' }}>
-                      {varieties.length} varieties recommended for {formData.state}
+                      {varieties.length > 0
+                        ? `${varieties.length} ${varieties.length === 1 ? 'variety' : 'varieties'} found in the training dataset for ${formData.state}`
+                        : `No verified state-specific variety recommendation is available for ${formData.state}. The dataset may contain unverified labels; confirm a local variety before forecasting.`}
                     </small>
                   </div>
 

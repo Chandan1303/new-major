@@ -40,7 +40,7 @@ export default function LoginPage() {
   };
 
   return (
-    <AuthLayout variant="modern">
+    <AuthLayout variant="modern" page="login">
       <section className="auth-rebuilt-card" aria-labelledby="login-heading">
         <nav className="auth-rebuilt-tabs" aria-label="Account access">
           <span className="auth-rebuilt-tab is-active" aria-current="page">Sign in</span>

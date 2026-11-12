@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import AppLayout from '../components/AppLayout';
-import { NDVI_DATA, NDVI_PERIOD, NDVI_CLASSIFICATIONS, classifyMeanNdvi, formatMeanNdvi, getDistrictNdvi } from '../data/ndviDistrictData';
+import { NDVI_DATA, NDVI_PERIOD, NDVI_STATE_PERIODS, NDVI_CLASSIFICATIONS, classifyMeanNdvi, formatMeanNdvi, getDistrictNdvi } from '../data/ndviDistrictData';
+import { Activity, AlertTriangle, BarChart3, CalendarDays, Info, ListChecks, MapPin, Satellite, Sprout } from 'lucide-react';
 
 const stateMapImages = {
   'Andhra Pradesh': '/images/ndvi-maps/Andhra-Pradesh.png',
+  'Madhya Pradesh': '/images/ndvi-maps/Madhya-Pradesh.png',
   Bihar: '/images/ndvi-maps/Bihar.png',
   Gujarat: '/images/ndvi-maps/Gujarat.png',
   Haryana: '/images/ndvi-maps/Haryana.png',
@@ -14,6 +16,7 @@ const stateMapImages = {
   Telangana: '/images/ndvi-maps/Telangana.png',
   Uttarakhand: '/images/ndvi-maps/Uttarakhand.png',
   'Uttar Pradesh': '/images/ndvi-maps/Uttar-Pradesh.png',
+  'West Bengal': '/images/ndvi-maps/West-Bengal.png',
 };
 
 const NDVI_GEOGRAPHY = Object.entries(NDVI_DATA).map(([state, records]) => ({
@@ -27,6 +30,9 @@ export default function CropHealthPage() {
   const selectedRegion = NDVI_GEOGRAPHY.find(region => region.state === selectedState);
   const availableDistricts = selectedRegion?.districts || [];
   const selectedRecord = getDistrictNdvi(selectedState, selectedDistrict);
+  const selectedPeriod = Object.prototype.hasOwnProperty.call(NDVI_STATE_PERIODS, selectedState)
+    ? NDVI_STATE_PERIODS[selectedState]
+    : NDVI_PERIOD;
   const currentNDVIValue = selectedRecord?.ndvi ?? null;
   const classification = classifyMeanNdvi(currentNDVIValue);
   const currentNDVIHealth = classification ? {
@@ -44,8 +50,9 @@ export default function CropHealthPage() {
   const currentHealthStatus = classification?.category || 'Unavailable';
   const currentHealthColor = classification?.color || '#64748b';
   const currentVigor = currentNDVIValue == null ? null : Math.round(currentNDVIValue * 100);
-  const observationStartDate = NDVI_PERIOD.start_date;
-  const observationEndDate = NDVI_PERIOD.end_date;
+  const observationStartDate = selectedPeriod?.start_date || null;
+  const observationEndDate = selectedPeriod?.end_date || null;
+  const observationPeriodLabel = `${NDVI_PERIOD.start_date} – ${NDVI_PERIOD.end_date}`;
   const healthThresholds = NDVI_CLASSIFICATIONS.map(item => ({
     ...item,
     ndvi_range: { min: item.min, max: item.max },
@@ -55,14 +62,19 @@ export default function CropHealthPage() {
   }));
   const currentNDVIData = selectedRecord ? {
     data_source: 'provided-period-mean',
-    timestamp: `${NDVI_PERIOD.end_date}T00:00:00`,
+    timestamp: observationEndDate ? `${observationEndDate}T00:00:00` : null,
     location: { state: selectedState, district: selectedDistrict },
     ndvi_data: {
-      source: 'User-provided hardcoded district mean',
+      source: selectedRecord.source_district
+        ? `User-provided district NDVI summary (${selectedRecord.source_district})`
+        : 'User-provided district mean NDVI',
       ndvi_mean: selectedRecord.ndvi,
-      observation_date: NDVI_PERIOD.end_date,
-      start_date: NDVI_PERIOD.start_date,
-      end_date: NDVI_PERIOD.end_date,
+      ndvi_max: selectedRecord.ndvi_max ?? null,
+      ndvi_min: selectedRecord.ndvi_min ?? null,
+      satellite: selectedPeriod?.satellite || null,
+      observation_date: observationEndDate,
+      start_date: observationStartDate,
+      end_date: observationEndDate,
       average_health: currentNDVIHealth,
     },
   } : null;
@@ -75,7 +87,7 @@ export default function CropHealthPage() {
             <p className="eyebrow">Regional NDVI Monitoring</p>
             <h1 className="page-title">Crop Health & Vegetation Analysis</h1>
             <p className="page-subtitle">
-              District mean NDVI values supplied for January 1 through July 31, 2026.
+              District mean NDVI values are shown for the period 1 January to 31 July 2026.
             </p>
           </div>
           <span className="badge badge-green">2026 district mean NDVI</span>
@@ -84,7 +96,7 @@ export default function CropHealthPage() {
         {/* Location Selector */}
         <div className="dash-panel" style={{ marginBottom: 24 }}>
           <div className="dash-panel-header">
-            <h3>📍 Select Location for NDVI Monitoring</h3>
+              <h3><MapPin size={17} aria-hidden="true" /> Select Location for NDVI Monitoring</h3>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, padding: '16px 24px', alignItems: 'end' }}>
             <div style={{ flex: 1 }}>
@@ -122,7 +134,7 @@ export default function CropHealthPage() {
         {/* NDVI Overview - Enhanced with Real Data */}
         <div className="summary-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))' }}>
           <div className="summary-card" style={{ '--card-accent': currentHealthColor }}>
-            <div className="sc-icon">🛰️</div>
+            <div className="sc-icon"><Satellite size={19} aria-hidden="true" /></div>
             <div className="sc-body">
               <span className="sc-label">Mean NDVI value</span>
               <span className="sc-value">{formatMeanNdvi(currentNDVIValue)}</span>
@@ -135,7 +147,7 @@ export default function CropHealthPage() {
           </div>
 
           <div className="summary-card" style={{ '--card-accent': currentHealthColor }}>
-            <div className="sc-icon">{currentNDVIHealth?.icon || '💚'}</div>
+            <div className="sc-icon"><Activity size={19} aria-hidden="true" /></div>
             <div className="sc-body">
               <span className="sc-label">Crop Health Status</span>
               <span className={`sc-value crop-health-status ndvi-status-${currentHealthStatus.toLowerCase().replace(/\s+/g, '-')}`} style={{ color: currentHealthColor }}>
@@ -145,7 +157,7 @@ export default function CropHealthPage() {
           </div>
 
           <div className="summary-card" style={{ '--card-accent': currentHealthColor }}>
-            <div className="sc-icon">🌿</div>
+            <div className="sc-icon"><Sprout size={19} aria-hidden="true" /></div>
             <div className="sc-body">
               <span className="sc-label">Vegetation Vigor</span>
               <span className="sc-value">{currentVigor == null ? '—' : `${currentVigor}%`}</span>
@@ -153,21 +165,22 @@ export default function CropHealthPage() {
           </div>
 
           <div className="summary-card" style={{ '--card-accent': '#3b82f6' }}>
-            <div className="sc-icon">📅</div>
+            <div className="sc-icon"><CalendarDays size={19} aria-hidden="true" /></div>
             <div className="sc-body">
               <span className="sc-label">Observation Period</span>
               <span className="sc-value" style={{ fontSize: 14 }}>
-                {observationStartDate} – {observationEndDate}
+                {observationPeriodLabel}
               </span>
             </div>
           </div>
+
         </div>
 
         {/* NDVI Health Classification Guide */}
         {currentNDVIHealth && (
           <div className="dash-panel" style={{ marginBottom: 24 }}>
             <div className="dash-panel-header">
-              <h3>🔍 Current Health Analysis</h3>
+              <h3><Activity size={17} aria-hidden="true" /> Current Health Analysis</h3>
               <span className={`badge crop-health-status-badge ndvi-status-${currentHealthStatus.toLowerCase().replace(/\s+/g, '-')}`} style={{ background: currentHealthColor, color: 'white' }}>
                 {currentHealthStatus}
               </span>
@@ -196,12 +209,12 @@ export default function CropHealthPage() {
                       borderRadius: 8,
                       marginBottom: 12
                     }}>
-                      <strong>⚠️ Action Required ({currentNDVIHealth.priority} Priority)</strong>
+                      <strong><AlertTriangle size={15} aria-hidden="true" /> Action Required ({currentNDVIHealth.priority} Priority)</strong>
                     </div>
                   )}
 
                   <div>
-                    <strong style={{ display: 'block', marginBottom: 8 }}>📋 Recommendations:</strong>
+                    <strong style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}><ListChecks size={15} aria-hidden="true" /> Recommendations</strong>
                     <ul style={{ marginLeft: 20, lineHeight: 1.8 }}>
                       {currentNDVIHealth.recommendations?.map((rec, idx) => (
                         <li key={idx}>{rec}</li>
@@ -248,11 +261,11 @@ export default function CropHealthPage() {
         )}
 
         <div className="dash-two-col">
-          {/* State-level NDVI image provided with the 2026 district period data. */}
+          {/* Show supplied state images when present; otherwise compare supplied district means. */}
           <div className="dash-panel">
             <div className="dash-panel-header">
-              <h3>{selectedState} NDVI Map</h3>
-              <span className="badge badge-green">District period averages</span>
+              <h3>{stateMapImages[selectedState] ? `${selectedState} NDVI Map` : `${selectedState} District NDVI`}</h3>
+              <span className="badge badge-green">District mean values</span>
             </div>
             <div className="ndvi-state-map-wrap">
               {stateMapImages[selectedState] ? (
@@ -261,10 +274,24 @@ export default function CropHealthPage() {
                   src={stateMapImages[selectedState]}
                   alt={`${selectedState} NDVI map`}
                 />
-              ) : <p>NDVI map image is not available for {selectedState}.</p>}
+              ) : (
+                <div className="ndvi-district-profile" role="list" aria-label={`${selectedState} district mean NDVI values`}>
+                  {availableDistricts.map(district => {
+                    const record = getDistrictNdvi(selectedState, district);
+                    const value = Number(record?.ndvi);
+                    const color = classifyMeanNdvi(value)?.color || '#64748b';
+                    const barWidth = Number.isFinite(value) ? Math.max(0, Math.min(100, value * 100)) : 0;
+                    return <div className="ndvi-district-profile-row" role="listitem" key={district}>
+                      <span className="ndvi-district-profile-name">{district}</span>
+                      <span className="ndvi-district-profile-track"><span style={{ width: `${barWidth}%`, backgroundColor: color }} /></span>
+                      <strong>{formatMeanNdvi(record?.ndvi)}</strong>
+                    </div>;
+                  })}
+                </div>
+              )}
               <div className="ndvi-state-map-caption">
-                <span><strong>Selected district:</strong> {selectedDistrict || '—'} · Mean NDVI {formatMeanNdvi(currentNDVIValue)}</span>
-                <span><strong>Period:</strong> {observationStartDate} to {observationEndDate}</span>
+                <span><strong>Selected district:</strong> {selectedDistrict || '—'} · Mean NDVI {formatMeanNdvi(currentNDVIValue)}{selectedRecord?.source_district ? ` · Source name: ${selectedRecord.source_district}` : ''}</span>
+                <span><strong>Period:</strong> {observationPeriodLabel}{selectedPeriod?.satellite ? ` · ${selectedPeriod.satellite}` : ''}</span>
               </div>
             </div>
           </div>
@@ -272,7 +299,7 @@ export default function CropHealthPage() {
           {/* NDVI Health Thresholds */}
           <div className="dash-panel">
             <div className="dash-panel-header">
-              <h3>📊 NDVI Health Classification Standards</h3>
+              <h3><BarChart3 size={17} aria-hidden="true" /> NDVI Health Classification Standards</h3>
             </div>
             <div style={{ padding: '16px 24px' }}>
               {healthThresholds.length > 0 ? (
@@ -301,7 +328,7 @@ export default function CropHealthPage() {
         {currentNDVIData && (
           <div className="dash-panel">
             <div className="dash-panel-header">
-              <h3>ℹ️ Data Source Information</h3>
+              <h3><Info size={17} aria-hidden="true" /> Data Source Information</h3>
             </div>
             <div style={{ padding: '16px 24px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
@@ -323,9 +350,13 @@ export default function CropHealthPage() {
                     {currentNDVIData.ndvi_data?.resolution_meters ? `${currentNDVIData.ndvi_data.resolution_meters}m` : 'Regional Average'}
                   </div>
                 </div>
+                {currentNDVIData.ndvi_data?.satellite && <div>
+                  <div className="ndvi-meta-label" style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>Satellite</div>
+                  <div style={{ fontWeight: 500 }}>{currentNDVIData.ndvi_data.satellite}</div>
+                </div>}
                 <div>
                   <div className="ndvi-meta-label" style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>Observation Period</div>
-                  <div style={{ fontWeight: 500 }}>{observationStartDate} to {observationEndDate}</div>
+                  <div style={{ fontWeight: 500 }}>{observationPeriodLabel}</div>
                 </div>
               </div>
             </div>

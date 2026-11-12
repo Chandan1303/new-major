@@ -1,0 +1,117 @@
+{
+  "Madhya Pradesh": {
+    "varieties": [
+      "Co 86032"
+    ],
+    "status": "Variety label present in project dataset; local suitability requires separate confirmation",
+    "source": "https://icar.gov.in/sites/default/files/2025-04/ICAR%20Annual%20Report%202023-24-english.pdf; https://sugarcane.res.in/?page_id=3539; https://icar.gov.in/en/node/11100",
+    "evidence": "The prepared dataset contains the listed variety label(s) for Madhya Pradesh. This records dataset presence only and should not be treated as independent confirmation of local recommendation."
+  },
+  "West Bengal": {
+    "varieties": [
+      "Co 0238"
+    ],
+    "status": "Variety label present in project dataset; local suitability requires separate confirmation",
+    "source": "https://icar.gov.in/sites/default/files/2025-04/ICAR%20Annual%20Report%202023-24-english.pdf",
+    "evidence": "The prepared dataset contains the listed variety label(s) for West Bengal. This records dataset presence only and should not be treated as independent confirmation of local recommendation."
+  },
+  "Andhra Pradesh": {
+    "varieties": [
+      "Co 86032"
+    ],
+    "status": "Existing project variety mapping; not verified in this web review",
+    "source": "backend/data/state_variety_recommendations.json",
+    "evidence": "Retained from the existing project configuration. This is not presented as an independently verified agronomic recommendation."
+  },
+  "Bihar": {
+    "varieties": [
+      "Co 0238",
+      "Co 86032"
+    ],
+    "status": "Existing project variety mapping; not verified in this web review",
+    "source": "backend/data/state_variety_recommendations.json",
+    "evidence": "Retained from the existing project configuration. This is not presented as an independently verified agronomic recommendation."
+  },
+  "Gujarat": {
+    "varieties": [
+      "Co 99004",
+      "Co 86032"
+    ],
+    "status": "Existing project variety mapping; not verified in this web review",
+    "source": "backend/data/state_variety_recommendations.json",
+    "evidence": "Retained from the existing project configuration. This is not presented as an independently verified agronomic recommendation."
+  },
+  "Haryana": {
+    "varieties": [
+      "CoC 671",
+      "Co 0238"
+    ],
+    "status": "Existing project variety mapping; not verified in this web review",
+    "source": "backend/data/state_variety_recommendations.json",
+    "evidence": "Retained from the existing project configuration. This is not presented as an independently verified agronomic recommendation."
+  },
+  "Karnataka": {
+    "varieties": [
+      "Co 86032",
+      "CoM 0265",
+      "Co 94012",
+      "Co 419",
+      "Co 62175"
+    ],
+    "status": "Existing project variety mapping; not verified in this web review",
+    "source": "backend/data/state_variety_recommendations.json",
+    "evidence": "Retained from the existing project configuration. This is not presented as an independently verified agronomic recommendation."
+  },
+  "Maharashtra": {
+    "varieties": [
+      "Co 86032",
+      "CoM 0265"
+    ],
+    "status": "Existing project variety mapping; not verified in this web review",
+    "source": "backend/data/state_variety_recommendations.json",
+    "evidence": "Retained from the existing project configuration. This is not presented as an independently verified agronomic recommendation."
+  },
+  "Punjab": {
+    "varieties": [
+      "Co 0238",
+      "CoC 671"
+    ],
+    "status": "Existing project variety mapping; not verified in this web review",
+    "source": "backend/data/state_variety_recommendations.json",
+    "evidence": "Retained from the existing project configuration. This is not presented as an independently verified agronomic recommendation."
+  },
+  "Tamil Nadu": {
+    "varieties": [
+      "Co 86032"
+    ],
+    "status": "Existing project variety mapping; not verified in this web review",
+    "source": "backend/data/state_variety_recommendations.json",
+    "evidence": "Retained from the existing project configuration. This is not presented as an independently verified agronomic recommendation."
+  },
+  "Telangana": {
+    "varieties": [
+      "Co 86032"
+    ],
+    "status": "Existing project variety mapping; not verified in this web review",
+    "source": "backend/data/state_variety_recommendations.json",
+    "evidence": "Retained from the existing project configuration. This is not presented as an independently verified agronomic recommendation."
+  },
+  "Uttar Pradesh": {
+    "varieties": [
+      "Co 0238",
+      "Co 86032"
+    ],
+    "status": "Existing project variety mapping; not verified in this web review",
+    "source": "backend/data/state_variety_recommendations.json",
+    "evidence": "Retained from the existing project configuration. This is not presented as an independently verified agronomic recommendation."
+  },
+  "Uttarakhand": {
+    "varieties": [
+      "Co 86032",
+      "Co 0238"
+    ],
+    "status": "Existing project variety mapping; not verified in this web review",
+    "source": "backend/data/state_variety_recommendations.json",
+    "evidence": "Retained from the existing project configuration. This is not presented as an independently verified agronomic recommendation."
+  }
+}
